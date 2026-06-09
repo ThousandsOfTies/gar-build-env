@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -50,7 +50,7 @@ configure_arm64_apt_sources() {
   local arm64_sources_file="/etc/apt/sources.list.d/ubuntu-ports-arm64.sources"
 
   if [[ -f "$sources_file" ]] && ! grep -q "^Architectures:" "$sources_file"; then
-    as_root cp "$sources_file" "${sources_file}.bak-agp-build-env"
+    as_root cp "$sources_file" "${sources_file}.bak-gar-build-env"
     as_root sed -i "/^Types: deb/a Architectures: amd64" "$sources_file"
   fi
 
@@ -90,7 +90,7 @@ clone_or_update() {
 install_packages
 mkdir -p "${repos_dir}"
 
-clone_or_update "https://github.com/ThousandsOfTies/agp-tools.git" "agp-tools"
+clone_or_update "https://github.com/ThousandsOfTies/gar-tools.git" "gar-tools"
 clone_or_update "https://github.com/ThousandsOfTies/embedded-poc-app.git" "embedded-poc-app"
 
 install_esp_idf() {
@@ -105,4 +105,4 @@ install_esp_idf() {
 
 install_esp_idf
 
-echo "AgentCockpit build environment is ready."
+echo "Gapless Agent Runtime build environment is ready."
