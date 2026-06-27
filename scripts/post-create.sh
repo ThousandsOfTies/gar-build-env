@@ -87,11 +87,37 @@ clone_or_update() {
   fi
 }
 
+ensure_path_line() {
+  local file="$1"
+  local line="$2"
+
+  touch "$file"
+  if ! grep -Fqx "$line" "$file"; then
+    printf '\n%s\n' "$line" >> "$file"
+  fi
+}
+
+install_platformio() {
+  local venv_path="${HOME}/.venvs/platformio"
+  local path_line='export PATH="$HOME/.venvs/platformio/bin:$PATH"'
+
+  if [[ ! -x "${venv_path}/bin/pio" ]]; then
+    echo "Installing PlatformIO..."
+    python3 -m venv "${venv_path}"
+    "${venv_path}/bin/python" -m pip install --upgrade pip
+    "${venv_path}/bin/pip" install --upgrade platformio
+  fi
+
+  ensure_path_line "${HOME}/.bashrc" "$path_line"
+  export PATH="${venv_path}/bin:${PATH}"
+}
+
 install_packages
 mkdir -p "${repos_dir}"
 
 clone_or_update "https://github.com/ThousandsOfTies/gar-tools.git" "gar-tools"
 clone_or_update "https://github.com/ThousandsOfTies/embedded-poc-app.git" "embedded-poc-app"
+clone_or_update "https://github.com/ThousandsOfTies/gar-vibe-ui.git" "gar-vibe-ui"
 
 install_esp_idf() {
   local idf_path="${HOME}/esp-idf"
@@ -104,5 +130,7 @@ install_esp_idf() {
 }
 
 install_esp_idf
+
+install_platformio
 
 echo "Gapless Agent Runtime build environment is ready."
