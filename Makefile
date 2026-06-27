@@ -2,6 +2,7 @@
 
 GAR_TOOLS_REPO := $(if $(wildcard repos/gar-tools/Makefile),repos/gar-tools,../gar-tools)
 EMBEDDED_APP_REPO := $(if $(wildcard repos/embedded-poc-app/Makefile),repos/embedded-poc-app,../embedded-poc-app)
+GAR_TOOLS_RUNTIME := $(GAR_TOOLS_REPO)/targets/linux-device/runtime
 ARTIFACT_ROOT ?= artifacts/from-codespace
 ARTIFACT_FILES := $(ARTIFACT_ROOT)/files
 
@@ -25,9 +26,9 @@ artifacts: build
 	rm -rf "$(ARTIFACT_ROOT)"
 	mkdir -p "$(ARTIFACT_FILES)"
 	cp "$(EMBEDDED_APP_REPO)/app/sensor_demo" "$(ARTIFACT_FILES)/sensor_demo"
-	cp "$(GAR_TOOLS_REPO)/cuse-stubs/i2c-stub/cuse_i2c" "$(ARTIFACT_FILES)/cuse_i2c"
-	cp "$(GAR_TOOLS_REPO)/cuse-stubs/spi-stub/cuse_spi" "$(ARTIFACT_FILES)/cuse_spi"
-	cp -R "$(GAR_TOOLS_REPO)/cuse-stubs/web-bridge" "$(ARTIFACT_FILES)/web-bridge"
+	cp "$(GAR_TOOLS_RUNTIME)/i2c-stub/cuse_i2c" "$(ARTIFACT_FILES)/cuse_i2c"
+	cp "$(GAR_TOOLS_RUNTIME)/spi-stub/cuse_spi" "$(ARTIFACT_FILES)/cuse_spi"
+	cp -R "$(GAR_TOOLS_RUNTIME)/web-bridge" "$(ARTIFACT_FILES)/web-bridge"
 	python3 scripts/write_artifact_manifest.py "$(ARTIFACT_ROOT)"
 	@echo "Wrote artifact bundle: $(ARTIFACT_ROOT)"
 
