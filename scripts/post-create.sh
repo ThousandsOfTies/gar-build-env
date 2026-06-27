@@ -82,6 +82,8 @@ clone_or_update() {
 
   if [[ -d "${dst}/.git" ]]; then
     git -C "${dst}" pull --ff-only
+  elif [[ -e "${dst}" ]]; then
+    echo "Using existing non-git directory: ${dst}"
   else
     git clone "${url}" "${dst}"
   fi
