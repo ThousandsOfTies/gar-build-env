@@ -101,6 +101,7 @@ ensure_path_line() {
 
 install_platformio() {
   local venv_path="${HOME}/.venvs/platformio"
+  local bin_path="${HOME}/.local/bin"
   local path_line='export PATH="$HOME/.venvs/platformio/bin:$PATH"'
 
   if [[ ! -x "${venv_path}/bin/pio" ]]; then
@@ -111,6 +112,8 @@ install_platformio() {
   fi
 
   ensure_path_line "${HOME}/.bashrc" "$path_line"
+  mkdir -p "$bin_path"
+  ln -sf "${venv_path}/bin/pio" "${bin_path}/pio"
   export PATH="${venv_path}/bin:${PATH}"
 }
 
