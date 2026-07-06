@@ -2,7 +2,6 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-repos_dir="${repo_root}/repos"
 
 as_root() {
   if [[ "$(id -u)" == "0" ]]; then
@@ -75,20 +74,6 @@ EOF
   rm -f "$tmp_sources"
 }
 
-clone_or_update() {
-  local url="$1"
-  local name="$2"
-  local dst="${repos_dir}/${name}"
-
-  if [[ -d "${dst}/.git" ]]; then
-    git -C "${dst}" pull --ff-only
-  elif [[ -e "${dst}" ]]; then
-    echo "Using existing non-git directory: ${dst}"
-  else
-    git clone "${url}" "${dst}"
-  fi
-}
-
 ensure_path_line() {
   local file="$1"
   local line="$2"
@@ -118,11 +103,7 @@ install_platformio() {
 }
 
 install_packages
-mkdir -p "${repos_dir}"
-
-clone_or_update "https://github.com/ThousandsOfTies/gar-tools.git" "gar-tools"
-clone_or_update "https://github.com/ThousandsOfTies/embedded-poc-app.git" "embedded-poc-app"
-clone_or_update "https://github.com/ThousandsOfTies/gar-vibe-ui.git" "gar-vibe-ui"
+make -C "${repo_root}" setup
 
 install_esp_idf() {
   local idf_path="${HOME}/esp-idf"
