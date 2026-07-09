@@ -18,15 +18,16 @@ Codespaces runs `scripts/post-create.sh`, which delegates to:
 ```text
 scripts/bootstrap.sh
   scripts/setup-common.sh
-  scripts/setup-product.sh
+  scripts/setup-product-branch.sh
 ```
 
-`setup-product.sh` is intentionally optional-file friendly:
+`setup-product-branch.sh` is the common product-branch dispatcher. It is
+intentionally optional-file friendly:
 
 ```bash
 [ -f config/product.env ] && source config/product.env
 [ -f .gitmodules ] && git submodule update --init --recursive
-[ -x scripts/product-setup.sh ] && scripts/product-setup.sh
+[ -x scripts/product-install.sh ] && scripts/product-install.sh
 ```
 
 ## Product Branches
