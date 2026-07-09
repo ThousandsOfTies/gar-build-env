@@ -14,7 +14,8 @@ This branch configures the Vibe Remote product devspace.
 - Build hook: `scripts/product-build.sh`
 - Artifact hook: `scripts/product-artifacts.sh`
 
-Use `make setup`, `make build`, and `make artifacts` from the repository root.
+Use `make build` and `make artifacts` from the repository root. The Devcontainer runs
+setup at creation time; use `make setup` only when setup must be rerun explicitly.
 Set `VIBE_BUILD_FIRMWARE=1` when the M5StickC firmware package should also be
 built. Otherwise the default build focuses on the VS Code extension and bridge.
 
