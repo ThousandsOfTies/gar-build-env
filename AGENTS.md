@@ -3,6 +3,23 @@
 This repository is the GAR Codespaces/devcontainer runtime. Product-specific
 configuration lives on long-lived product branches of this repository.
 
+## GarVibeRemote Branch
+
+This branch configures the Vibe Remote product devspace.
+
+- Product source submodule: `sources/gar-vibe-ui`
+- Package root: `sources/gar-vibe-ui/vibe-remote`
+- Setup hook: `scripts/product-setup.sh`
+- Build hook: `scripts/product-build.sh`
+- Artifact hook: `scripts/product-artifacts.sh`
+
+Use `make setup`, `make build`, and `make artifacts` from the repository root.
+Set `VIBE_BUILD_FIRMWARE=1` when the M5StickC firmware package should also be
+built. Otherwise the default build focuses on the VS Code extension and bridge.
+
+When editing product source, commit and push `sources/gar-vibe-ui` first, then
+commit the parent submodule pointer in this repository.
+
 ## Roles
 
 - `main`: common devspace runtime, setup sequence, shared defaults.

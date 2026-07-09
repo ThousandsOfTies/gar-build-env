@@ -2,6 +2,40 @@
 
 Gapless Agent Runtime 用の Codespaces/devcontainer ビルド環境です。
 
+## GarVibeRemote Branch
+
+このブランチは Vibe Remote 製品用の devspace 定義です。共通 runtime は
+`main` と同じまま、製品固有の設定だけをこのブランチに保持します。
+
+```text
+sources/gar-vibe-ui/          # product source submodule
+config/product.env            # GarVibeRemote settings
+scripts/product-setup.sh      # npm dependency setup
+scripts/product-build.sh      # extension compile/typecheck/lint/test
+scripts/product-artifacts.sh  # artifact bundle writer
+scripts/product-clean.sh      # generated output cleanup
+```
+
+通常の入口:
+
+```bash
+make setup
+make build
+make artifacts
+```
+
+M5StickC firmware artifact も作る場合:
+
+```bash
+VIBE_BUILD_FIRMWARE=1 make build
+make artifacts
+```
+
+製品ソースを更新したら、先に `sources/gar-vibe-ui` 側を commit/push し、
+その後このリポジトリで submodule pointer を commit/push してください。
+
+---
+
 このリポジトリは Codespaces/devcontainer の共通実行基盤です。
 
 `main` は共通 devspace runtime だけを持ちます。製品ごとの設定は
