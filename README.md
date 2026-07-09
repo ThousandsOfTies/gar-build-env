@@ -10,6 +10,7 @@ Gapless Agent Runtime 用の Codespaces/devcontainer ビルド環境です。
 ```text
 sources/gar-vibe-ui/          # product source submodule
 config/product.env            # GarVibeRemote settings
+config/artifact-manifest.json # artifact/deploy definition
 scripts/product-setup.sh      # npm dependency setup
 scripts/product-build.sh      # extension compile/typecheck/lint/test
 scripts/product-artifacts.sh  # artifact bundle writer

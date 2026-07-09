@@ -1,0 +1,16 @@
+{
+  "name": "gar-vibe-remote-bundle",
+  "deploy": {
+    "vscodeExtension": {
+      "files": [
+        {
+          "src": "files/vibe-remote-extension",
+          "dest": "~/vibe-remote-extension"
+        }
+      ]
+    },
+    "m5stickcFirmware": {
+      "artifact": null
+    }
+  }
+}
