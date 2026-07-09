@@ -11,7 +11,7 @@ ARTIFACT_ROOT ?= artifacts/from-codespace
 all: artifacts
 
 setup:
-	scripts/setup-product.sh
+	scripts/setup-product-branch.sh
 
 sync: setup
 	@if [ -f .gitmodules ]; then \

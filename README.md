@@ -11,7 +11,7 @@ Gapless Agent Runtime 用の Codespaces/devcontainer ビルド環境です。
 sources/gar-vibe-ui/          # product source submodule
 config/product.env            # GarVibeRemote settings
 config/artifact-manifest.json # artifact/deploy definition
-scripts/product-setup.sh      # npm dependency setup
+scripts/product-install.sh    # npm dependency setup
 scripts/product-build.sh      # extension compile/typecheck/lint/test
 scripts/product-artifacts.sh  # artifact bundle writer
 scripts/product-clean.sh      # generated output cleanup
@@ -56,7 +56,7 @@ gar-build-env/
   scripts/
     bootstrap.sh
     setup-common.sh
-    setup-product.sh
+    setup-product-branch.sh
   artifacts/             # generated output, ignored
 ```
 
@@ -69,10 +69,10 @@ Codespaces 起動時は `.devcontainer/devcontainer.json` の `postCreateCommand
 
 ```text
 scripts/setup-common.sh
-scripts/setup-product.sh
+scripts/setup-product-branch.sh
   config/product.env があれば読む
   .gitmodules があれば git submodule update --init --recursive
-  scripts/product-setup.sh が実行可能なら実行
+  scripts/product-install.sh が実行可能なら実行
 ```
 
 手動で実行する場合:
@@ -97,7 +97,7 @@ make sync
 
 ```text
 config/product.env
-scripts/product-setup.sh
+scripts/product-install.sh
 scripts/product-build.sh
 scripts/product-artifacts.sh
 scripts/product-clean.sh
@@ -126,7 +126,7 @@ git push
 次の hook を追加します。
 
 ```text
-scripts/product-setup.sh
+scripts/product-install.sh
 scripts/product-build.sh
 scripts/product-artifacts.sh
 scripts/product-clean.sh
