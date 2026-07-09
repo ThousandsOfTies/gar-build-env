@@ -37,7 +37,7 @@ export GAR_TOOLS_ROOT="${tools_root}"
 export GAR_WOKWI_CLIENT_DIR="${client_dir}"
 export GAR_WOKWI_PROJECT_DIR="${repo_root}/.gar/wokwi/m5stackc"
 export GAR_WOKWI_TEMPLATE_DIR="${tools_root}/targets/esp32/wokwi/m5stackc"
-export GAR_VIBE_REMOTE_M5_SRC_DIR="${client_dir}/src"
+export GAR_WOKWI_APP_SRC_DIR="${client_dir}/src"
 export GAR_SIM_PROVIDER="${GAR_SIM_PROVIDER:-wokwi}"
 
 exec "${runtime_root}/scripts/gar" "$@"
