@@ -12,10 +12,6 @@ if [[ -f "${repo_root}/.gitmodules" ]]; then
   git -C "${repo_root}" submodule update --init --recursive
 fi
 
-if [[ -f "${repo_root}/repos/product.repos" ]]; then
-  "${repo_root}/scripts/import-repos.sh" "${repo_root}/repos/product.repos"
-fi
-
 if [[ -x "${repo_root}/scripts/product-setup.sh" ]]; then
   "${repo_root}/scripts/product-setup.sh"
 fi
