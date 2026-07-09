@@ -6,8 +6,8 @@ configuration lives on long-lived product branches of this repository.
 ## Roles
 
 - `main`: common devspace runtime, setup sequence, shared defaults.
-- Product branches: product-specific config, optional repo import definitions,
-  optional submodule set, and setup/build hooks.
+- Product branches: product-specific config, optional `sources/*` submodules,
+  and setup/build hooks.
 - Submodules, when present on a product branch: official editable source
   repositories, not ignored scratch space.
 
@@ -26,7 +26,6 @@ scripts/bootstrap.sh
 ```bash
 [ -f config/product.env ] && source config/product.env
 [ -f .gitmodules ] && git submodule update --init --recursive
-[ -f repos/product.repos ] && scripts/import-repos.sh repos/product.repos
 [ -x scripts/product-setup.sh ] && scripts/product-setup.sh
 ```
 

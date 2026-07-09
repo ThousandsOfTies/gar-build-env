@@ -6,8 +6,8 @@ Gapless Agent Runtime 用の Codespaces/devcontainer ビルド環境です。
 
 `main` は共通 devspace runtime だけを持ちます。製品ごとの設定は
 `gar-build-env` の製品ブランチに保存します。製品ブランチは
-`config/product.env`、`repos/product.repos`、任意の `scripts/product-*.sh`、
-必要なら `.gitmodules` を持ちます。
+`config/product.env`、任意の `scripts/product-*.sh`、必要なら
+`sources/*` submodule を持ちます。
 
 ## Layout
 
@@ -18,13 +18,10 @@ gar-build-env/
     common.env
     product.env.example
   Makefile
-  repos/
-    product.repos.example
   scripts/
     bootstrap.sh
     setup-common.sh
     setup-product.sh
-    import-repos.sh
   artifacts/             # generated output, ignored
 ```
 
@@ -40,7 +37,6 @@ scripts/setup-common.sh
 scripts/setup-product.sh
   config/product.env があれば読む
   .gitmodules があれば git submodule update --init --recursive
-  repos/product.repos があれば任意で vcs import
   scripts/product-setup.sh が実行可能なら実行
 ```
 
@@ -66,12 +62,11 @@ make sync
 
 ```text
 config/product.env
-repos/product.repos
 scripts/product-setup.sh
 scripts/product-build.sh
 scripts/product-artifacts.sh
 scripts/product-clean.sh
-.gitmodules
+sources/* submodules
 AGENTS.md
 ```
 
