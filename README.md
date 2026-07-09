@@ -56,6 +56,8 @@ make sync
 `make setup` は製品ブランチに定義された設定を読み、必要な準備だけを実行します。
 `.gitmodules` がある場合は、親リポジトリが記録している submodule commit を再現します。
 `make sync` は branch checkout されている submodule だけ `git pull --ff-only` します。
+`make build` と `make artifacts` はセットアップを自動実行しません。起動時セットアップは
+Devcontainer の `postCreateCommand` に限定し、必要な場合だけ明示的に `make setup` を実行します。
 
 ## Product Branches
 

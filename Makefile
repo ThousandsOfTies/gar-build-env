@@ -13,12 +13,12 @@ all: artifacts
 setup:
 	scripts/setup-product-branch.sh
 
-sync: setup
+sync:
 	@if [ -f .gitmodules ]; then \
 		git submodule foreach --recursive 'branch=$$(git branch --show-current); if [ -n "$$branch" ]; then git pull --ff-only; else echo "detached HEAD; skip pull"; fi'; \
 	fi
 
-build: setup
+build:
 	@if [ -x "$(PRODUCT_BUILD_SCRIPT)" ]; then \
 		"$(PRODUCT_BUILD_SCRIPT)"; \
 	else \
