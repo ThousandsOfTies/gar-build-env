@@ -16,6 +16,7 @@ gar-build-env/
   .devcontainer/
   config/
     common.env
+    artifact-manifest.example.json
     product.env.example
   Makefile
   scripts/
@@ -99,6 +100,9 @@ scripts/product-clean.sh
 
 `make build` は `scripts/product-build.sh` があれば実行します。
 `make artifacts` は `scripts/product-artifacts.sh` があれば実行します。
+Artifact manifest は製品固有の定義です。必要な製品ブランチで
+`config/artifact-manifest.example.json` を参考に、製品用の設定ファイルや
+`scripts/product-artifacts.sh` を追加してください。
 
 PlatformIO は Python 仮想環境 `~/.venvs/platformio` にインストールされ、
 `~/.bashrc` に PATH が追加されます。

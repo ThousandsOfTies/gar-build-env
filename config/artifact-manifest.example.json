@@ -1,0 +1,14 @@
+{
+  "name": "example-product-bundle",
+  "deploy": {
+    "example": {
+      "files": [
+        {
+          "src": "files/example-output",
+          "dest": "~/example-output",
+          "mode": "0755"
+        }
+      ]
+    }
+  }
+}

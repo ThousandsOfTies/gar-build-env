@@ -33,6 +33,9 @@ scripts/bootstrap.sh
 
 Do not add product-specific source repositories to `main`. Put each product's
 repository set, config, and setup/build hooks on that product's branch.
+Artifact manifests are product-specific config, not shared runtime code. Use
+`config/artifact-manifest.example.json` as a template when a product branch
+needs a deploy manifest.
 
 ## Submodule Edits
 
