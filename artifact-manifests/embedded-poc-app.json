@@ -1,0 +1,32 @@
+{
+  "name": "gar-poc-bundle",
+  "deploy": {
+    "app": {
+      "files": [
+        {
+          "src": "files/sensor_demo",
+          "dest": "~/sensor_demo",
+          "mode": "0755"
+        }
+      ]
+    },
+    "sim_env": {
+      "files": [
+        {
+          "src": "files/cuse_i2c",
+          "dest": "~/cuse_i2c",
+          "mode": "0755"
+        },
+        {
+          "src": "files/cuse_spi",
+          "dest": "~/cuse_spi",
+          "mode": "0755"
+        },
+        {
+          "src": "files/web-bridge",
+          "dest": "~/web-bridge"
+        }
+      ]
+    }
+  }
+}
