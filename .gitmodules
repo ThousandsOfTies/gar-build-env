@@ -1,3 +1,9 @@
 [submodule "sources/gar-vibe-ui"]
 	path = sources/gar-vibe-ui
 	url = https://github.com/ThousandsOfTies/gar-vibe-ui
+[submodule "sources/GaplessAgentRuntime"]
+	path = sources/GaplessAgentRuntime
+	url = https://github.com/ThousandsOfTies/GaplessAgentRuntime
+[submodule "sources/gar-tools"]
+	path = sources/gar-tools
+	url = https://github.com/ThousandsOfTies/gar-tools

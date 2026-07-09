@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+if [[ -f "${repo_root}/config/product.env" ]]; then
+  # shellcheck disable=SC1091
+  source "${repo_root}/config/product.env"
+fi
+
+runtime_dir="${GAR_RUNTIME_DIR:-sources/GaplessAgentRuntime}"
+tools_dir="${GAR_TOOLS_DIR:-sources/gar-tools}"
+package_dir="${VIBE_REMOTE_PACKAGE_DIR:-sources/gar-vibe-ui/vibe-remote}"
+client_dir="${repo_root}/${package_dir}/m5stickc-client"
+runtime_root="${repo_root}/${runtime_dir}"
+tools_root="${repo_root}/${tools_dir}"
+
+if [[ ! -x "${runtime_root}/scripts/gar" ]]; then
+  echo "missing GAR runtime: ${runtime_root}" >&2
+  echo "Run: git submodule update --init --recursive" >&2
+  exit 1
+fi
+
+if [[ ! -f "${client_dir}/Makefile" ]]; then
+  echo "missing Vibe Remote Wokwi client: ${client_dir}" >&2
+  echo "Run: git submodule update --init --recursive" >&2
+  exit 1
+fi
+
+export GAR_TOOLS_ROOT="${tools_root}"
+export GAR_WOKWI_CLIENT_DIR="${client_dir}"
+export GAR_WOKWI_PROJECT_DIR="${repo_root}/.gar/wokwi/m5stackc"
+export GAR_WOKWI_TEMPLATE_DIR="${tools_root}/targets/esp32/wokwi/m5stackc"
+export GAR_VIBE_REMOTE_M5_SRC_DIR="${client_dir}/src"
+export GAR_SIM_PROVIDER="${GAR_SIM_PROVIDER:-wokwi}"
+
+exec "${runtime_root}/scripts/gar" "$@"

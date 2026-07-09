@@ -4,6 +4,7 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 package_dir="${VIBE_REMOTE_PACKAGE_DIR:-sources/gar-vibe-ui/vibe-remote}"
 package_root="${repo_root}/${package_dir}"
+gar_runtime_dir="${GAR_RUNTIME_DIR:-sources/GaplessAgentRuntime}"
 
 if [[ ! -f "${package_root}/package.json" ]]; then
   echo "missing Vibe Remote package: ${package_root}" >&2
@@ -23,3 +24,8 @@ else
 fi
 
 echo "GarVibeRemote setup complete: ${package_root}"
+
+if [[ -x "${repo_root}/${gar_runtime_dir}/scripts/gar" ]]; then
+  mkdir -p "${HOME}/.local/bin"
+  ln -sf "${repo_root}/scripts/gar" "${HOME}/.local/bin/gar"
+fi

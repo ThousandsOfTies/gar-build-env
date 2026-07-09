@@ -8,6 +8,8 @@ configuration lives on long-lived product branches of this repository.
 This branch configures the Vibe Remote product devspace.
 
 - Product source submodule: `sources/gar-vibe-ui`
+- GAR runtime submodule: `sources/GaplessAgentRuntime`
+- Wokwi template submodule: `sources/gar-tools`
 - Package root: `sources/gar-vibe-ui/vibe-remote`
 - Artifact manifest: `config/artifact-manifest.json`
 - Install hook: `scripts/product-install.sh`
@@ -16,6 +18,7 @@ This branch configures the Vibe Remote product devspace.
 
 Use `make build` and `make artifacts` from the repository root. The Devcontainer runs
 setup at creation time; use `make setup` only when setup must be rerun explicitly.
+Use `gar sim build` to build the M5StickC Wokwi firmware.
 Set `VIBE_BUILD_FIRMWARE=1` when the M5StickC firmware package should also be
 built. Otherwise the default build focuses on the VS Code extension and bridge.
 
