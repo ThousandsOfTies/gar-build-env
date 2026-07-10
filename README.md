@@ -27,7 +27,8 @@ make artifacts
 ```
 
 Wokwi 用の M5StickC firmware は、ローカルPCの GaplessAgentRuntime から
-`gar sim build` を実行して Codespaces 側でビルドします。`sources/gar-tools` が
+`gar sim build` を実行します。GAR は設定済みの local workspace または Codespaces
+で `scripts/product-sim-build.sh` を実行します。`sources/gar-tools` が
 Wokwi の配線・テンプレート、`sources/gar-vibe-ui` が Vibe Remote の firmware を提供します。
 
 M5StickC firmware artifact も作る場合:
