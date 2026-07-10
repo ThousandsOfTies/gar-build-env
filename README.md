@@ -23,6 +23,7 @@ gar-build-env/
     bootstrap.sh
     setup-common.sh
     setup-product-branch.sh
+    product-sim-build.sh.example
   artifacts/             # generated output, ignored
 ```
 
@@ -59,6 +60,18 @@ make sync
 `make build` と `make artifacts` はセットアップを自動実行しません。起動時セットアップは
 Devcontainer の `postCreateCommand` に限定し、必要な場合だけ明示的に `make setup` を実行します。
 
+## GAR Simulation Build Hook
+
+`gar sim build` の入口は Codespaces 固有ではなく、ローカルまたは Codespaces 上で動く
+GaplessAgentRuntime です。製品 branch で simulation build が必要な場合は、
+`scripts/product-sim-build.sh.example` を `scripts/product-sim-build.sh` にコピーして
+アプリ固有の build コマンドを定義してください。GAR はその script を呼び出します。
+
+通常、製品 branch はアプリを `sources/<app>`、共有 simulation asset を
+`sources/gar-tools` に submodule として持ちます。template の `GAR_SIM_APP_DIR` と
+`GAR_TOOLS_DIR` はその配置を参照し、アプリ側の command には
+`GAR_TOOLS_ROOT` として後者を渡せます。
+
 ## Product Branches
 
 製品ブランチでは、共通シーケンスをなるべく触らず、個別定義だけを追加します。
@@ -69,6 +82,7 @@ scripts/product-install.sh
 scripts/product-build.sh
 scripts/product-artifacts.sh
 scripts/product-clean.sh
+scripts/product-sim-build.sh
 sources/* submodules
 AGENTS.md
 ```
