@@ -1,0 +1,8 @@
+[submodule "sources/gar-stream-rx"]
+	path = sources/gar-stream-rx
+	url = https://github.com/ThousandsOfTies/gar-stream-rx
+	branch = main
+[submodule "sources/gar-tools"]
+	path = sources/gar-tools
+	url = https://github.com/ThousandsOfTies/gar-tools
+	branch = main
