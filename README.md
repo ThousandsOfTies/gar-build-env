@@ -9,7 +9,6 @@ Gapless Agent Runtime 用の Codespaces/devcontainer ビルド環境です。
 
 ```text
 sources/gar-vibe-ui/          # product source submodule
-sources/GaplessAgentRuntime/  # GAR CLI runtime submodule
 sources/gar-tools/            # Wokwi template submodule
 config/product.env            # GarVibeRemote settings
 config/artifact-manifest.json # artifact/deploy definition
@@ -27,14 +26,9 @@ make build
 make artifacts
 ```
 
-Wokwi 用の M5StickC firmware は、製品設定を読む `gar` ラッパーからビルドします。
-
-```bash
-gar sim build
-```
-
-`sources/GaplessAgentRuntime` が GAR CLI、`sources/gar-tools` が Wokwi の配線・
-テンプレート、`sources/gar-vibe-ui` が Vibe Remote の firmware を提供します。
+Wokwi 用の M5StickC firmware は、ローカルPCの GaplessAgentRuntime から
+`gar sim build` を実行して Codespaces 側でビルドします。`sources/gar-tools` が
+Wokwi の配線・テンプレート、`sources/gar-vibe-ui` が Vibe Remote の firmware を提供します。
 
 M5StickC firmware artifact も作る場合:
 
