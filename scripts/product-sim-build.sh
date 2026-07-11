@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
-# Copy this file to scripts/product-sim-build.sh on a product branch, then
-# replace product_sim_build with the product's simulation build command.
-#
 # GaplessAgentRuntime invokes scripts/product-sim-build.sh for `gar sim build`.
-# The script runs from either a configured local product workspace or its
-# Codespaces workspace; keep all paths relative to this repository root.
+# GarStreamRx is a Python application for the Luckfox RV1106 target.  The
+# simulation artifact is therefore a validated application bundle, while
+# `gar sim env build` builds the separate Linux device stubs and web bridge.
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -14,27 +12,50 @@ if [[ -f "${repo_root}/config/product.env" ]]; then
   source "${repo_root}/config/product.env"
 fi
 
-# Product branches normally keep their application and the shared simulation
-# assets as submodules below sources/.  Override either path in product.env
-# when a product uses a different layout.
-app_dir="${repo_root}/${GAR_SIM_APP_DIR:-sources/your-app}"
+app_dir="${repo_root}/${GAR_SIM_APP_DIR:-sources/gar-stream-rx}"
 tools_dir="${repo_root}/${GAR_TOOLS_DIR:-sources/gar-tools}"
+target="${GAR_SIM_TARGET:-luckfox-rv1106}"
+artifact_root="${repo_root}/${GAR_SIM_ARTIFACT_ROOT:-artifacts/from-codespace}"
+artifact_dir="${artifact_root}/files/gar-stream-rx"
+deploy_dest="${GAR_SIM_ARTIFACT_DEST:-~/gar-stream-rx}"
 
-if [[ ! -d "${app_dir}" || ! -d "${tools_dir}" ]]; then
+if [[ ! -f "${app_dir}/video_monitor.py" || ! -f "${app_dir}/requirements.txt" || ! -d "${tools_dir}/targets/linux-device/runtime" ]]; then
   echo "missing simulation sources; run: git submodule update --init --recursive" >&2
   exit 1
 fi
 
-product_sim_build() {
-  # Replace this example with the application's simulation build command.
-  # Pass GAR_TOOLS_ROOT="${tools_dir}" when the application's build supports
-  # it, so that it uses this branch's checked-out gar-tools revision.
-  #
-  # Example:
-  #   make -C "${app_dir}" sim-build GAR_TOOLS_ROOT="${tools_dir}"
-  echo "No simulation build command configured for ${GAR_PRODUCT_NAME:-this product}." >&2
-  echo "Edit scripts/product-sim-build.sh on this product branch." >&2
-  return 1
-}
+rm -rf "${artifact_root}"
+mkdir -p "${artifact_dir}"
 
-product_sim_build
+# Keep the deployable app self-contained and validate all Python sources in
+# the copied artifact, so build output never adds __pycache__ to the submodule.
+cp "${app_dir}"/*.py "${app_dir}/requirements.txt" "${artifact_dir}/"
+python3 -m compileall -q -f "${artifact_dir}"
+
+python3 - "${artifact_root}/artifact.json" "${target}" "${deploy_dest}" <<'PY'
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+output, target, destination = sys.argv[1:]
+payload = {
+    "name": "gar-stream-rx-simulation",
+    "target": target,
+    "deploy": {
+        "app": {
+            "files": [
+                {
+                    "src": "files/gar-stream-rx",
+                    "dest": destination,
+                }
+            ]
+        }
+    },
+}
+Path(output).write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+PY
+
+echo "Target: ${target}"
+echo "Artifact: ${artifact_root}"
