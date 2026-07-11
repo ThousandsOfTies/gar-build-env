@@ -19,6 +19,17 @@ artifact_root="${repo_root}/${GAR_SIM_ARTIFACT_ROOT:-artifacts/from-codespace}"
 artifact_dir="${artifact_root}/files/gar-stream-rx"
 deploy_dest="${GAR_SIM_ARTIFACT_DEST:-~/gar-stream-rx}"
 
+if [[ "$#" -gt 1 || ( "$#" -eq 1 && "$1" != "clean" ) ]]; then
+  echo "usage: $0 [clean]" >&2
+  exit 2
+fi
+
+if [[ "${1:-}" == "clean" ]]; then
+  rm -rf "${artifact_root}"
+  echo "Removed simulation artifact: ${artifact_root}"
+  exit 0
+fi
+
 if [[ ! -f "${app_dir}/video_monitor.py" || ! -f "${app_dir}/requirements.txt" || ! -d "${tools_dir}/targets/linux-device/runtime" ]]; then
   echo "missing simulation sources; run: git submodule update --init --recursive" >&2
   exit 1
