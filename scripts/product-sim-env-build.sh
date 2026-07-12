@@ -38,9 +38,11 @@ docker run --rm \
   make
 
 mkdir -p "${files_dir}"
+rm -f "${files_dir}/cuse_spi_ili9341"
 cp "${runtime_dir}/i2c-stub/cuse_i2c" "${files_dir}/cuse_i2c"
-cp "${runtime_dir}/spi-stub/cuse_spi" "${files_dir}/cuse_spi"
-cp "${runtime_dir}/ili9341-stub/cuse_spi_ili9341" "${files_dir}/cuse_spi_ili9341"
+# GAR's generic SPI systemd unit starts /usr/local/sbin/cuse_spi.  For the RX
+# product that binary must emulate the ILI9341 panel, not the MFRC-522 stub.
+cp "${runtime_dir}/ili9341-stub/cuse_spi_ili9341" "${files_dir}/cuse_spi"
 rm -rf "${files_dir}/web-bridge"
 mkdir -p "${files_dir}/web-bridge"
 cp -R "${runtime_dir}/web-bridge/." "${files_dir}/web-bridge/"
@@ -66,11 +68,6 @@ deploy["sim_env"] = {
     "files": [
         {"src": "files/cuse_i2c", "dest": "~/cuse_i2c", "mode": "0755"},
         {"src": "files/cuse_spi", "dest": "~/cuse_spi", "mode": "0755"},
-        {
-            "src": "files/cuse_spi_ili9341",
-            "dest": "/usr/local/sbin/cuse_spi_ili9341",
-            "mode": "0755",
-        },
         {"src": "files/web-bridge", "dest": "~/web-bridge"},
     ]
 }
