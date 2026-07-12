@@ -35,7 +35,7 @@ if [[ ! -f "${app_dir}/camera_tx.py" || ! -f "${app_dir}/requirements.txt" || ! 
   exit 1
 fi
 
-rm -rf "${artifact_root}"
+rm -rf "${artifact_dir}"
 mkdir -p "${artifact_dir}"
 
 # Compile the copied sources so build output never adds __pycache__ to the
@@ -51,21 +51,24 @@ import sys
 from pathlib import Path
 
 output, target, destination = sys.argv[1:]
-payload = {
-    "name": "gar-stream-tx-simulation",
-    "target": target,
-    "deploy": {
-        "app": {
-            "files": [
-                {
-                    "src": "files/gar-stream-tx",
-                    "dest": destination,
-                }
-            ]
+output_path = Path(output)
+try:
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+except FileNotFoundError:
+    payload = {"name": "gar-stream-tx-simulation", "deploy": {}}
+
+payload["name"] = "gar-stream-tx-simulation"
+payload["target"] = target
+deploy = payload.setdefault("deploy", {})
+deploy["app"] = {
+    "files": [
+        {
+            "src": "files/gar-stream-tx",
+            "dest": destination,
         }
-    },
+    ]
 }
-Path(output).write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 PY
 
 echo "Target: ${target}"
