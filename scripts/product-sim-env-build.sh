@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Build GarStreamTx's ARM64 virtual-device runtime for `gar sim env build`.
 # This hook runs in the selected product workspace.  Runtime binaries are
-# cross-compiled for the ARM64 simulation host and later transferred by
-# `gar sim env deploy`.
+# cross-compiled in the product branch's Docker build environment and later
+# transferred by `gar sim env deploy`.
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -14,18 +14,26 @@ fi
 
 tools_dir="${repo_root}/${GAR_TOOLS_DIR:-sources/gar-tools}"
 runtime_dir="${tools_dir}/targets/linux-device/runtime"
+dockerfile="${repo_root}/Dockerfile"
+image="${GAR_SIM_RUNTIME_BUILD_IMAGE:-gar-build-env-arm64-runtime}"
 
-if [[ ! -f "${runtime_dir}/Makefile" ]]; then
+if [[ ! -f "${runtime_dir}/Makefile" || ! -f "${dockerfile}" ]]; then
   echo "missing Linux simulation runtime; run: git submodule update --init --recursive" >&2
   exit 1
 fi
 
-if ! command -v aarch64-linux-gnu-gcc >/dev/null 2>&1; then
-  echo "gar sim env build: aarch64-linux-gnu-gcc が見つかりません。" >&2
-  echo "local でビルドする場合は ARM64 cross compiler を導入してください。" >&2
-  echo "Codespaces workspace を選択してビルドすることもできます。" >&2
+if ! command -v docker >/dev/null 2>&1 || ! docker info >/dev/null 2>&1; then
+  echo "gar sim env build: local runtime build requires a usable Docker daemon." >&2
+  echo "Run gar setup and choose Local Docker, or select a Codespaces workspace." >&2
   exit 1
 fi
 
-make -C "${runtime_dir}"
+docker build --tag "${image}" --file "${dockerfile}" "${repo_root}"
+docker run --rm \
+  --user "$(id -u):$(id -g)" \
+  --volume "${tools_dir}:/work/gar-tools" \
+  --workdir /work/gar-tools/targets/linux-device/runtime \
+  "${image}" \
+  make
+
 echo "Simulation runtime built: ${runtime_dir}"
