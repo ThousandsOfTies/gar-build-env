@@ -2,7 +2,7 @@
 # Copy this file to scripts/product-target-build.sh on a product branch, then
 # replace product_target_build with the product's physical-target build command.
 #
-# GaplessAgentRuntime invokes this hook for `gar target build`.  The hook must
+# GaplessAgentRuntime invokes this hook for `gar target app build`.  The hook must
 # write artifacts/from-codespace/artifact.json with a deploy.app section.
 set -euo pipefail
 

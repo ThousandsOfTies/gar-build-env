@@ -2,7 +2,7 @@
 # Copy this file to scripts/product-sim-build.sh on a product branch, then
 # replace product_sim_build with the product's simulation build command.
 #
-# GaplessAgentRuntime invokes scripts/product-sim-build.sh for `gar sim build`.
+# GaplessAgentRuntime invokes scripts/product-sim-build.sh for `gar sim app build`.
 # The script runs from either a configured local product workspace or its
 # Codespaces workspace; keep all paths relative to this repository root.
 set -euo pipefail

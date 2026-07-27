@@ -63,7 +63,7 @@ Devcontainer の `postCreateCommand` に限定し、必要な場合だけ明示�
 
 ## GAR Simulation Build Hook
 
-`gar sim build` の入口は Codespaces 固有ではなく、ローカルまたは Codespaces 上で動く
+`gar sim app build` の入口は Codespaces 固有ではなく、ローカルまたは Codespaces 上で動く
 GaplessAgentRuntime です。製品 branch で simulation build が必要な場合は、
 `scripts/product-sim-build.sh.example` を `scripts/product-sim-build.sh` にコピーして
 アプリ固有の build コマンドを定義してください。GAR はその script を呼び出します。
@@ -75,7 +75,7 @@ GaplessAgentRuntime です。製品 branch で simulation build が必要な場�
 
 ## GAR Target Build Hook
 
-`gar target build` は、選択したLocalまたはCodespaces build environmentで
+`gar target app build` は、選択したLocalまたはCodespaces build environmentで
 `scripts/product-target-build.sh`を実行します。製品branchでは
 `scripts/product-target-build.sh.example`をコピーし、`deploy.app`を持つ
 `artifacts/from-codespace/artifact.json`を生成するbuild commandを定義してください。
