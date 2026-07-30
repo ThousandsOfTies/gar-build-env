@@ -1,0 +1,8 @@
+[submodule "sources/gar-adhoc-app"]
+	path = sources/gar-adhoc-app
+	url = https://github.com/ThousandsOfTies/gar-adhoc-app
+	branch = main
+[submodule "sources/gar-tools"]
+	path = sources/gar-tools
+	url = https://github.com/ThousandsOfTies/gar-tools
+	branch = main
