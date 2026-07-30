@@ -17,9 +17,10 @@ This branch configures the Vibe Remote product devspace.
 
 Use `make build` and `make artifacts` from the repository root. The Devcontainer runs
 setup at creation time; use `make setup` only when setup must be rerun explicitly.
-Use the local GaplessAgentRuntime `gar sim build` command to build the M5StickC
-Wokwi firmware. GAR invokes `scripts/product-sim-build.sh` in the configured
-local workspace or Codespaces workspace.
+Use GaplessAgentRuntime's `gar sim app build`, `gar sim app deploy`, then
+`gar sim runtime start` commands for the M5StickC Wokwi flow. GAR invokes
+`scripts/product-sim-build.sh` in the configured local workspace or Codespaces
+workspace; the hook must write a `deploy.app` artifact for the deploy step.
 Set `VIBE_BUILD_FIRMWARE=1` when the M5StickC firmware package should also be
 built. Otherwise the default build focuses on the VS Code extension and bridge.
 

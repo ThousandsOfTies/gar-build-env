@@ -15,7 +15,9 @@ config/artifact-manifest.json # artifact/deploy definition
 scripts/product-install.sh    # npm dependency setup
 scripts/product-build.sh      # extension compile/typecheck/lint/test
 scripts/product-artifacts.sh  # artifact bundle writer
-scripts/product-clean.sh      # generated output cleanup
+scripts/product-sim-build.sh      # Wokwi firmware build + SIM_APP artifact
+scripts/package_wokwi_sim_app.py # runnable fileの検証・安全なartifact交換
+scripts/product-clean.sh          # generated output cleanup
 ```
 
 通常の入口:
@@ -26,10 +28,22 @@ make build
 make artifacts
 ```
 
-Wokwi 用の M5StickC firmware は、ローカルPCの GaplessAgentRuntime から
-`gar sim build` を実行します。GAR は設定済みの local workspace または Codespaces
-で `scripts/product-sim-build.sh` を実行します。`sources/gar-tools` が
-Wokwi の配線・テンプレート、`sources/gar-vibe-ui` が Vibe Remote の firmware を提供します。
+Wokwi 用の M5StickC firmware は、GaplessAgentRuntime から次の順に扱います。
+
+```bash
+scripts/gar sim app build
+scripts/gar sim app deploy
+scripts/gar sim runtime start --no-port-forward
+scripts/gar sim runtime diag --json
+```
+
+`gar sim app build` は設定済みの local workspace または Codespaces で
+`scripts/product-sim-build.sh` を実行します。hook は `sources/gar-tools` の
+配線・テンプレートと `sources/gar-vibe-ui` のアプリソースから firmware を
+ビルドし、Wokwi 起動に必要なファイルを `deploy.app` artifact に格納します。
+`gar sim app deploy` がその artifact を runtime workspace へ展開し、
+`gar sim runtime start` は配置済み project を起動します。Wokwi には別の
+runtime artifact がないため、`gar sim runtime build/deploy` は不要です。
 
 M5StickC firmware artifact も作る場合:
 
