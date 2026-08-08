@@ -7,13 +7,15 @@
     <script type="module" src="/components/bridge-status.js"></script>
     <script type="module" src="/components/rotary-control.js"></script>
     <script type="module" src="/components/ili9341-display.js"></script>
+    <script type="module" src="/components/video-transmitter.js"></script>
     <link rel="stylesheet" href="./panel.css">
   </head>
   <body>
     <main>
       <header><div><p>GARSTREAM</p><h1>TX · Camera transmitter</h1></div><gar-bridge-status></gar-bridge-status></header>
       <p class="lead">The transmitter's local controls and display. This screen is independent of GarStreamRx.</p>
-      <div class="grid"><gar-ili9341-display></gar-ili9341-display><gar-rotary-control></gar-rotary-control></div>
+      <div class="grid"><gar-video-transmitter></gar-video-transmitter><gar-rotary-control></gar-rotary-control></div>
+      <gar-ili9341-display></gar-ili9341-display>
     </main>
   </body>
 </html>
