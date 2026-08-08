@@ -40,8 +40,12 @@ docker run --rm \
   make
 
 mkdir -p "${files_dir}"
+rm -f "${files_dir}/cuse_spi_ili9341"
 cp "${runtime_dir}/i2c-stub/cuse_i2c" "${files_dir}/cuse_i2c"
-cp "${runtime_dir}/spi-stub/cuse_spi" "${files_dir}/cuse_spi"
+# GAR's generic SPI systemd unit starts /usr/local/sbin/cuse_spi.  This
+# product uses that device for its local ILI9341 preview, so install the
+# display-aware CUSE implementation under the generic service name.
+cp "${runtime_dir}/ili9341-stub/cuse_spi_ili9341" "${files_dir}/cuse_spi"
 rm -rf "${files_dir}/web-bridge"
 mkdir -p "${files_dir}/web-bridge"
 cp -R "${runtime_dir}/web-bridge/." "${files_dir}/web-bridge/"
