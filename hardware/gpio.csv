@@ -1,0 +1,4 @@
+name,chip,line,direction,role,active,initial,pull,sim_control,description
+encoder_a,/dev/gpiochip0,17,input,encoder,high,,pull-up,pull,KY-040 clock
+encoder_b,/dev/gpiochip0,27,input,encoder,high,,pull-up,pull,KY-040 data
+encoder_sw,/dev/gpiochip0,22,input,button,low,,pull-up,pull,KY-040 switch

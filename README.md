@@ -122,3 +122,15 @@ Artifact manifest は製品固有の定義です。必要な製品ブランチ�
 
 PlatformIO は Python 仮想環境 `~/.venvs/platformio` にインストールされ、
 `~/.bashrc` に PATH が追加されます。
+
+## GarStreamTx simulation
+
+ブラウザの PC カメラは Web Panel から Bridge へ JPEG フレームとして入り、Bridge が
+GStreamer と `v4l2loopback` を使って `/dev/video0` に YUY2 形式で書き込みます。
+Tx アプリは実機と同じ `v4l2src device=/dev/video0` から映像を取得し、MJPEG/RTP/UDP
+として GarStreamRx の private IP、port 5600 へ送信します。
+
+シミュレータ固有なのは `/dev/video0` を作る入力側だけです。実機では同じデバイスパスに
+USB UVC カメラを接続し、カメラ固有の caps と I/O mode を環境変数
+`GAR_CAMERA_CAPS` / `GAR_CAMERA_IO_MODE` で指定します。アプリとネットワーク経路は
+シミュレータ・実機で共通です。

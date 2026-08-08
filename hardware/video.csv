@@ -1,0 +1,2 @@
+name,dev,driver,sim,width,height,fps,description
+ov3660_camera,/dev/video0,uvcvideo,v4l2loopback,640,480,30,Browser-fed V4L2 camera compatible with the physical UVC input
