@@ -77,8 +77,8 @@ fi
 cat > "${service_file}" <<EOF
 [Unit]
 Description=GarStreamTx simulation application
-After=network-online.target gar-v4l2-camera.service gar-gpio-sim.service gar-bridge.service
-Wants=network-online.target gar-v4l2-camera.service gar-gpio-sim.service gar-bridge.service
+After=network-online.target gar-v4l2-camera.service gar-gpio-sim.service gar-cuse-spi@spidev0.0.service gar-bridge.service
+Wants=network-online.target gar-v4l2-camera.service gar-gpio-sim.service gar-cuse-spi@spidev0.0.service gar-bridge.service
 PartOf=gar-sim.target
 
 [Service]
@@ -92,6 +92,9 @@ Environment=GAR_CAMERA_HEIGHT=480
 Environment=GAR_CAMERA_FPS=30
 Environment=GAR_CAMERA_CAPS=video/x-raw,format=YUY2
 Environment=GAR_CAMERA_IO_MODE=mmap
+Environment=GAR_LOCAL_DISPLAY=1
+Environment=GAR_LCD_DC_GPIO=23
+Environment=GAR_LCD_RST_GPIO=24
 Environment=GAR_STREAM_RX_HOST=${rx_host}
 Environment=GAR_STREAM_RX_PORT=5600
 ExecStartPre=/bin/sh -c 'for n in \$(seq 1 50); do [ -S /run/gar/hw_sim.sock ] && exit 0; sleep 0.1; done; exit 1'
