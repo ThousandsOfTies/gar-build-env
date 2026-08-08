@@ -1,0 +1,5 @@
+component_id,name,kind,part_number,description
+raspi5_tx,Raspberry Pi 5 (TX),board,Raspberry Pi 5,GarStreamTx physical target
+uvc_camera,USB UVC camera,camera,OV3660,Camera input exposed as /dev/video0
+ky040_encoder,Rotary encoder,input,KY-040,TX menu control
+ili9341_lcd,Local preview display,display,ILI9341,320x240 SPI RGB565 local preview

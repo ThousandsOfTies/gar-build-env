@@ -1,0 +1,15 @@
+source,source_pin,target,target_pin,signal,description
+raspi5_tx,physical pin 1 (3.3V),ky040_encoder,+,3.3V,Encoder power; do not connect to 5V
+raspi5_tx,physical pin 6 (GND),ky040_encoder,GND,GND,Encoder ground
+raspi5_tx,physical pin 11 (GPIO17),ky040_encoder,CLK,GPIO17,Rotary clock input
+raspi5_tx,physical pin 13 (GPIO27),ky040_encoder,DT,GPIO27,Rotary data input
+raspi5_tx,physical pin 15 (GPIO22),ky040_encoder,SW,GPIO22,Rotary push switch input
+raspi5_tx,USB 2.0 or USB 3.0 port,uvc_camera,USB,USB,UVC camera data and power; appears as /dev/video0
+raspi5_tx,physical pin 1 (3.3V),ili9341_lcd,VCC,3.3V,Display logic power
+raspi5_tx,physical pin 6 (GND),ili9341_lcd,GND,GND,Display ground
+raspi5_tx,physical pin 19 (GPIO10/MOSI),ili9341_lcd,SDI,MOSI,SPI0 data to display
+raspi5_tx,physical pin 23 (GPIO11/SCLK),ili9341_lcd,SCK,SCLK,SPI0 clock
+raspi5_tx,physical pin 24 (GPIO8/CE0),ili9341_lcd,CS,CE0,SPI0 chip select 0
+raspi5_tx,physical pin 16 (GPIO23),ili9341_lcd,DC,GPIO23,Display command/data select
+raspi5_tx,physical pin 18 (GPIO24),ili9341_lcd,RST,GPIO24,Display reset
+raspi5_tx,physical pin 1 (3.3V),ili9341_lcd,LED,3.3V,Display backlight supply
