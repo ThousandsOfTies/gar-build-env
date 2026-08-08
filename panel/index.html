@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GarStreamTx simulator</title>
+    <script type="module" src="/components/bridge-status.js"></script>
+    <script type="module" src="/components/rotary-control.js"></script>
+    <script type="module" src="/components/ili9341-display.js"></script>
+    <link rel="stylesheet" href="./panel.css">
+  </head>
+  <body>
+    <main>
+      <header><div><p>GARSTREAM</p><h1>TX · Camera transmitter</h1></div><gar-bridge-status></gar-bridge-status></header>
+      <p class="lead">The transmitter's local controls and display. This screen is independent of GarStreamRx.</p>
+      <div class="grid"><gar-ili9341-display></gar-ili9341-display><gar-rotary-control></gar-rotary-control></div>
+    </main>
+  </body>
+</html>
