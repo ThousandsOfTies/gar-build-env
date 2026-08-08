@@ -5,7 +5,7 @@ header p { color: #7dd3fc; font-size: .75rem; letter-spacing: .18em; margin: 0; 
 gar-bridge-status { font-size: .85rem; color: #fbbf24; } gar-bridge-status[data-connected="true"] { color: #5eead4; }
 .lead { color: #b8c6d9; }
 .camera-debug { max-width: 380px; margin: 20px 0; }
-.hardware-grid { display: grid; grid-template-columns: minmax(0, 1fr) 210px; gap: 20px; max-width: 760px; }
+.hardware-grid { display: grid; grid-template-columns: minmax(0, 1fr) 210px; gap: 20px; }
 gar-ili9341-display section, gar-rotary-control section { display: grid; gap: 12px; padding: 16px; border: 1px solid #28415d; border-radius: 12px; background: #162235; }
 gar-video-transmitter section { display: grid; gap: 12px; padding: 16px; border: 1px solid #28415d; border-radius: 12px; background: #162235; }
 .label { color: #7dd3fc; font-size: .7rem; letter-spacing: .12em; } canvas { width: 100%; background: #050a12; image-rendering: pixelated; }
