@@ -50,30 +50,6 @@ python3 -m compileall -q -f "${artifact_dir}"
 
 printf '%s\n' "${panel_dest}" > "${artifact_root}/files/panel-dir"
 
-rx_host="${GAR_STREAM_RX_HOST:-}"
-if [[ -z "${rx_host}" ]]; then
-  config_path="${GAR_CONFIG_PATH:-${repo_root}/../GAR/GaplessAgentRuntime/.gar/config.json}"
-  rx_host="$(python3 - "${config_path}" <<'PY'
-import json
-import sys
-from pathlib import Path
-
-path = Path(sys.argv[1])
-if not path.is_file():
-    raise SystemExit(0)
-for workspace in json.loads(path.read_text(encoding="utf-8")).get("workspaces", []):
-    connection = workspace.get("connection", {})
-    if workspace.get("name", "").endswith("GarStreamRx") or Path(connection.get("path", "")).name == "GarStreamRx":
-        print(workspace.get("ec2", {}).get("private_ip", ""))
-        break
-PY
-)"
-fi
-if [[ -z "${rx_host}" ]]; then
-  echo "GarStreamRx private IP is unknown; run its 'gar sim infra apply' first or set GAR_STREAM_RX_HOST." >&2
-  exit 1
-fi
-
 cat > "${service_file}" <<EOF
 [Unit]
 Description=GarStreamTx simulation application
@@ -95,8 +71,9 @@ Environment=GAR_CAMERA_IO_MODE=mmap
 Environment=GAR_LOCAL_DISPLAY=1
 Environment=GAR_LCD_DC_GPIO=23
 Environment=GAR_LCD_RST_GPIO=24
-Environment=GAR_STREAM_RX_HOST=${rx_host}
-Environment=GAR_STREAM_RX_PORT=5600
+Environment=GAR_STREAM_SOURCE_ID=gar-stream-tx-sim
+Environment=GAR_STREAM_SOURCE_NAME=GarStreamTx
+Environment=GAR_STREAM_DISCOVERY_PORT=5601
 ExecStartPre=/bin/sh -c 'for n in \$(seq 1 50); do [ -S /run/gar/hw_sim.sock ] && exit 0; sleep 0.1; done; exit 1'
 ExecStart=/usr/bin/python3 ${deploy_dest}/camera_tx.py
 Restart=on-failure

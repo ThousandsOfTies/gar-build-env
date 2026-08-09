@@ -38,6 +38,20 @@ Artifact manifests are product-specific config, not shared runtime code. Use
 `config/artifact-manifest.example.json` as a template when a product branch
 needs a deploy manifest.
 
+Use `scripts/product-sim-build.sh` for simulation artifacts and
+`scripts/product-target-build.sh` for physical-target artifacts. GAR passes the
+selected target ID to the latter as `GAR_TARGET`. A physical-target artifact
+owns only the product application and its executable `run` entry point; it must
+not install root-owned service units, OS packages, simulation stubs, or Web
+Panel assets. Physical OS preparation and boot integration belong to the
+selected target's provisioning recipe in `gar-tools` and are applied through
+`gar target prepare`.
+
+GarStream connection ownership is RX-driven. TX advertises a Source and accepts
+renewable stream requests; do not add an RX host/address setting back to the TX.
+Keep the `gar-stream/1` messages in `source_advertiser.py` compatible with the
+RX repository's `source_browser.py`.
+
 ## Submodule Edits
 
 On product branches that use submodules, commit and push the child repository

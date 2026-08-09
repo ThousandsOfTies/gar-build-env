@@ -44,20 +44,33 @@ v4l2-ctl --device=/dev/video0 --list-formats-ext
 
 ## アプリ設定との対応
 
-実機起動では次を設定します。`GAR_STREAM_RX_HOST` には RX 実機の IP アドレスを入れます。
+TXはUDP 5601でSource広告を行い、RXの送信要求元へ映像を返すため、RXのIPアドレスを
+設定しません。以下はdefaultから変更したい場合だけ
+`/etc/gar/gar-stream-tx.env`へ保存する任意設定です。この永続設定は
+`gar target deploy`では上書きされません。
 
 ```bash
-export GAR_CAMERA_DEVICE=/dev/video0
-export GAR_ENC_CLK_GPIO=17
-export GAR_ENC_DT_GPIO=27
-export GAR_ENC_SW_GPIO=22
-export GAR_LOCAL_DISPLAY=1
-export GAR_LCD_DC_GPIO=23
-export GAR_LCD_RST_GPIO=24
-export GAR_STREAM_RX_HOST=<RXのIPアドレス>
-export GAR_STREAM_RX_PORT=5600
+GAR_GPIO_CHIP=/dev/gpiochip0
+GAR_CAMERA_DEVICE=/dev/video0
+GAR_ENC_CLK_GPIO=17
+GAR_ENC_DT_GPIO=27
+GAR_ENC_SW_GPIO=22
+GAR_STREAM_SOURCE_NAME=GarStreamTx
+GAR_STREAM_DISCOVERY_PORT=5601
+GAR_LOCAL_DISPLAY=1
+GAR_LCD_DC_GPIO=23
+GAR_LCD_RST_GPIO=24
 ```
 
 カメラの実際の native mode に合わせて、必要なら `GAR_CAMERA_WIDTH`、
 `GAR_CAMERA_HEIGHT`、`GAR_CAMERA_FPS`、`GAR_CAMERA_CAPS`、`GAR_CAMERA_IO_MODE` も設定します。
-初期値は OV3660 の MJPEG 2048x1536@15fps を想定しています。
+このRaspberry Pi 5実機で認識したUVCカメラはMJPEG 2048x1536@30fpsを広告するため、
+実機entry pointのcapture既定値は30fpsです。配信Profileは`videorate`後の15fps固定であり、
+カメラcapture値とは独立しています。
+Raspberry Pi 5ではBCM番号を旧sysfsのglobal GPIO番号として扱わず、
+`GAR_GPIO_CHIP=/dev/gpiochip0`と各line番号の組でcharacter device APIを使用します。
+
+実機は`raspberry-pi-5` Target recipeで準備し、共通
+`gar-app@gar-stream-tx.service`から非rootの`gar`accountとして起動します。
+real `/dev/video0`、`/dev/spidev0.0`、`/dev/gpiochip*`を利用し、gpio-sim/CUSE/Web
+Panelは実機へ導入しません。
