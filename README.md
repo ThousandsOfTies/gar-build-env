@@ -74,6 +74,23 @@ GaplessAgentRuntime です。製品 branch で simulation build が必要な場�
 `GAR_TOOLS_DIR` はその配置を参照し、アプリ側の command には
 `GAR_TOOLS_ROOT` として後者を渡せます。
 
+## GarStream system topology
+
+GarStream の system topology は RX parent の
+`/path/to/GarStreamRx/gar-system.json` が所有します。TX/RX をまとめて操作する場合は
+次を使います。
+
+```bash
+gar system build --file /path/to/GarStreamRx/gar-system.json --json
+gar system deploy --file /path/to/GarStreamRx/gar-system.json --json
+gar system start --file /path/to/GarStreamRx/gar-system.json --json
+```
+
+GAR が `/etc/gar/system/gar-stream-tx.env` へ注入する値は topology から得る runtime
+設定です。UDP discoveryのrequest/announceは逆向きの2 linkとして宣言されます。これは
+persistent target config の `/etc/gar/gar-stream-tx.env` と分離され、
+artifact には persistent target config や machine IP を含めません。
+
 ## GAR Target Build Hook
 
 `gar target build`は、選択したBuildEnvironmentで

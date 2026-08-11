@@ -74,6 +74,10 @@ Environment=GAR_LCD_RST_GPIO=24
 Environment=GAR_STREAM_SOURCE_ID=gar-stream-tx-sim
 Environment=GAR_STREAM_SOURCE_NAME=GarStreamTx
 Environment=GAR_STREAM_DISCOVERY_PORT=5601
+# System topology values are materialised here by gar system deploy.  Keep
+# this after the static fallbacks: systemd applies assignments in declaration
+# order, so a non-default link port takes precedence at runtime.
+EnvironmentFile=-/etc/gar/system/gar-stream-tx.env
 ExecStartPre=/bin/sh -c 'for n in \$(seq 1 50); do [ -S /run/gar/hw_sim.sock ] && exit 0; sleep 0.1; done; exit 1'
 ExecStart=/usr/bin/python3 ${deploy_dest}/camera_tx.py
 Restart=on-failure
