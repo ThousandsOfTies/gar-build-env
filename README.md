@@ -91,6 +91,19 @@ GAR が `/etc/gar/system/gar-stream-tx.env` へ注入する値は topology か�
 persistent target config の `/etc/gar/gar-stream-tx.env` と分離され、
 artifact には persistent target config や machine IP を含めません。
 
+## GarStream hardware contract
+
+製品が必要とするcamera/display/GPIO/networkは `hardware/requirements.json`、Raspberry Pi 5
+のresourceへの対応は `hardware/bindings/raspberry-pi-5.json` に追跡します。Targetの
+capabilityと照合してから実機へ配置します。
+
+```bash
+gar hw validate --workspace Local/GarStreamTx --binding hardware/bindings/raspberry-pi-5.json --json
+```
+
+これはTarget capability・product requirement・physical bindingの3層を分離します。IPやSSH
+connection、永続環境変数はここへ入れません。
+
 ## GAR Target Build Hook
 
 `gar target build`は、選択したBuildEnvironmentで

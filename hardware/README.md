@@ -4,6 +4,15 @@
 BCM GPIO 番号は `camera_tx.py` の既定値と一致しています。配線を変更する場合は、
 この CSV と起動時の `GAR_*` 環境変数を同時に更新してください。
 
+## 要件・Target capability・binding
+
+`requirements.json` は TX が必要とする装置と電気的条件だけを宣言します。
+`bindings/raspberry-pi-5.json` はその要件を Raspberry Pi 5 Target の resource に結びます。
+実際に使えるGPIO/SPI/USB/network、driver、電圧、pinmuxはTarget capabilityの責務です。
+そのため `gar hw validate --json --workspace Local/GarStreamTx` で、deploy前にpin conflict、
+driver/voltage不足、SPI bus/CS重複、最低SPI速度を確認できます。SSH alias、IP、実機固有の
+任意設定はbindingにもartifactにも保存しません。
+
 ## 接続するモジュール
 
 | モジュール | 接続先 | アプリから見える I/F |
