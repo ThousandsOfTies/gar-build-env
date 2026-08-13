@@ -13,6 +13,13 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 
 
 class ProductBuildHookTests(unittest.TestCase):
+    def test_network_pipeline_forces_rtp_jpeg_compatible_format(self) -> None:
+        source = (REPOSITORY_ROOT / "sources/gar-stream-tx/camera_tx.py").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn('"! videoconvert ! video/x-raw,format=I420 "', source)
+
     def test_sim_service_uses_gar_managed_system_environment(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
