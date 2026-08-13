@@ -68,6 +68,8 @@ Environment=GAR_CAMERA_HEIGHT=480
 Environment=GAR_CAMERA_FPS=30
 Environment=GAR_CAMERA_CAPS=video/x-raw,format=YUY2
 Environment=GAR_CAMERA_IO_MODE=mmap
+# Golden E2E is headless, so provide frames without a browser websocket.
+Environment=GAR_CAMERA_TEST_PATTERN=1
 Environment=GAR_LOCAL_DISPLAY=1
 Environment=GAR_LCD_DC_GPIO=23
 Environment=GAR_LCD_RST_GPIO=24
