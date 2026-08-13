@@ -1,0 +1,81 @@
+name: Product parent CI
+
+on:
+  pull_request:
+  push:
+    branches: [GarStreamTx]
+
+permissions:
+  contents: read
+
+jobs:
+  product-contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout GarStreamTx parent and pinned children
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          persist-credentials: false
+      - name: Checkout canonical GAR main
+        uses: actions/checkout@v4
+        with:
+          repository: ThousandsOfTies/GaplessAgentRuntime
+          ref: main
+          path: _gar
+          persist-credentials: false
+      - name: Checkout shared GarStream system/scenario owner
+        uses: actions/checkout@v4
+        with:
+          repository: ThousandsOfTies/gar-build-env
+          ref: GarStreamRx
+          path: _rx-system
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run parent tests and shell syntax checks
+        run: |
+          python -m unittest discover -s tests -v
+          bash -n scripts/product-sim-build.sh scripts/product-sim-env-build.sh scripts/product-target-build.sh
+      - name: Build actual simulation and Target hook bundles
+        run: |
+          rm -rf artifacts/ci artifacts/from-codespace
+          mkdir -p artifacts/ci
+          bash scripts/product-sim-build.sh
+          mv artifacts/from-codespace artifacts/ci/sim
+          bash scripts/product-target-build.sh
+          mv artifacts/from-codespace artifacts/ci/target
+      - name: Validate with GAR canonical contracts
+        if: always()
+        run: |
+          python _gar/.github/scripts/garstream-parent-validate.py \
+            --gar-root _gar \
+            --product-root . \
+            --sim-bundle artifacts/ci/sim \
+            --target-bundle artifacts/ci/target \
+            --sim-target linux-device \
+            --sim-architecture aarch64 \
+            --sim-abi gnu \
+            --sim-toolchain aarch64-linux-gnu \
+            --sim-payload python \
+            --sim-entry files/gar-stream-tx \
+            --target raspberry-pi-5 \
+            --target-architecture aarch64 \
+            --target-abi gnu \
+            --target-toolchain aarch64-linux-gnu \
+            --target-payload python \
+            --target-entry files/gar-stream-tx \
+            --target-build-mode production \
+            --system-file _rx-system/gar-system.json \
+            --scenario-file _rx-system/scenarios/garstream_golden.json \
+            --report artifacts/ci/validation-report.json
+      - name: Retain product bundles and validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gar-stream-tx-parent-${{ github.run_id }}
+          path: artifacts/ci/
+          if-no-files-found: error
+          retention-days: 14

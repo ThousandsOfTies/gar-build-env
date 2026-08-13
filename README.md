@@ -104,6 +104,13 @@ gar hw validate --workspace Local/GarStreamTx --binding hardware/bindings/raspbe
 これはTarget capability・product requirement・physical bindingの3層を分離します。IPやSSH
 connection、永続環境変数はここへ入れません。
 
+## Runtime observation
+
+TXはruntimeで指定された`GAR_STREAM_METRICS_PATH`へatomic JSONを出力します。そこにはannounce、
+lease、実測送信FPS/frame count、`videorate`が実際にdropしたframe数、GStreamer latency query、menu、
+KY-040 event、healthを含めます。`configured_fps`は設定値であり実測FPSとは別です。artifact ID/hashは
+artifact storeが観測結果へ付与するため、アプリ環境変数に存在しない場合はnullです。
+
 ## GAR Target Build Hook
 
 `gar target build`は、選択したBuildEnvironmentで

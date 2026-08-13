@@ -17,9 +17,13 @@ class ProductBuildHookTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
             (root / "scripts").mkdir()
-            shutil.copy2(REPOSITORY_ROOT / "scripts" / "product-sim-build.sh", root / "scripts")
+            shutil.copy2(
+                REPOSITORY_ROOT / "scripts" / "product-sim-build.sh", root / "scripts"
+            )
             (root / "sources/gar-stream-tx").mkdir(parents=True)
-            (root / "sources/gar-tools/targets/linux-device/runtime").mkdir(parents=True)
+            (root / "sources/gar-tools/targets/linux-device/runtime").mkdir(
+                parents=True
+            )
             (root / "panel").mkdir()
             (root / "sources/gar-stream-tx/camera_tx.py").touch()
             (root / "sources/gar-stream-tx/requirements.txt").touch()
@@ -34,7 +38,9 @@ class ProductBuildHookTests(unittest.TestCase):
             )
 
             self.assertEqual(0, result.returncode, result.stderr)
-            service = (root / "artifacts/from-codespace/files/gar-sim-app.service").read_text(encoding="utf-8")
+            service = (
+                root / "artifacts/from-codespace/files/gar-sim-app.service"
+            ).read_text(encoding="utf-8")
             environment_file = "EnvironmentFile=-/etc/gar/system/gar-stream-tx.env"
             self.assertIn(environment_file, service)
             self.assertGreater(
@@ -45,9 +51,19 @@ class ProductBuildHookTests(unittest.TestCase):
             self.assertNotIn("GAR_STREAM_DISCOVERY_PEERS", service)
             self.assertNotIn("/etc/gar/gar-stream-tx.env", service)
             self.assertNotIn("192.0.2.10", service)
-            manifest = json.loads((root / "artifacts/from-codespace/artifact.json").read_text(encoding="utf-8"))
+            self.assertIn(
+                "Environment=GAR_STREAM_METRICS_PATH=/run/gar/metrics/gar-stream-tx.json",
+                service,
+            )
+            manifest = json.loads(
+                (root / "artifacts/from-codespace/artifact.json").read_text(
+                    encoding="utf-8"
+                )
+            )
             files = manifest["deploy"]["app"]["files"]
-            self.assertFalse(any(item["dest"] == "/etc/gar/gar-stream-tx.env" for item in files))
+            self.assertFalse(
+                any(item["dest"] == "/etc/gar/gar-stream-tx.env" for item in files)
+            )
 
 
 if __name__ == "__main__":
