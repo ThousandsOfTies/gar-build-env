@@ -63,8 +63,8 @@ WorkingDirectory=${deploy_dest}
 Environment=PYTHONUNBUFFERED=1
 Environment=GAR_GPIO_CHIP=/dev/gpiochip0
 Environment=GAR_CAMERA_DEVICE=/dev/video0
-Environment=GAR_CAMERA_WIDTH=640
-Environment=GAR_CAMERA_HEIGHT=480
+Environment=GAR_CAMERA_WIDTH=2048
+Environment=GAR_CAMERA_HEIGHT=1536
 Environment=GAR_CAMERA_FPS=30
 Environment=GAR_CAMERA_CAPS=video/x-raw,format=YUY2
 Environment=GAR_CAMERA_IO_MODE=mmap

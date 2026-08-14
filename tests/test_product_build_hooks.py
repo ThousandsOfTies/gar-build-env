@@ -62,6 +62,8 @@ class ProductBuildHookTests(unittest.TestCase):
                 "Environment=GAR_STREAM_METRICS_PATH=/run/gar/metrics/gar-stream-tx.json",
                 service,
             )
+            self.assertIn("Environment=GAR_CAMERA_WIDTH=2048", service)
+            self.assertIn("Environment=GAR_CAMERA_HEIGHT=1536", service)
             self.assertIn("Environment=GAR_CAMERA_TEST_PATTERN=1", service)
             manifest = json.loads(
                 (root / "artifacts/from-codespace/artifact.json").read_text(

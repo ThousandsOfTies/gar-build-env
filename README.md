@@ -181,6 +181,11 @@ PlatformIO は Python 仮想環境 `~/.venvs/platformio` にインストール�
 
 ブラウザの PC カメラは Web Panel から Bridge へ JPEG フレームとして入り、Bridge が
 GStreamer と `v4l2loopback` を使って `/dev/video0` に YUY2 形式で書き込みます。
+GarStreamTx のsimulation panelは、実機で使うOV3660と同じネイティブ
+`2048x1536@30fps` の入力を要求し、ブラウザからは15fpsで供給します。Bridge は足りない
+frameを複製してV4L2の30fps契約を保ちます。したがってTXのProfileは実機と同じく、
+このネイティブ入力を `320x240` / `640x480` / `1024x768` / `2048x1536` のRTP出力へ
+変換します。
 Tx アプリは実機と同じ `v4l2src device=/dev/video0` から映像を取得し、MJPEG/RTP/UDP
 SourceとしてUDP 5601で自己広告します。GarStreamRxは検出したSourceをチャンネル一覧へ
 保持し、選択したTXへlease付き送信要求を返します。TXは要求元IPのRTP port 5600へだけ
@@ -190,6 +195,9 @@ SourceとしてUDP 5601で自己広告します。GarStreamRxは検出したSour
 USB UVC カメラを接続し、カメラ固有の caps と I/O mode を環境変数
 `GAR_CAMERA_CAPS` / `GAR_CAMERA_IO_MODE` で指定します。アプリとネットワーク経路は
 シミュレータ・実機で共通です。
+
+TX/RXのILI9341プレビューは実機と同じ320x240固定のため、High qualityやMaximumを
+選んでもその小型LCD上の細部は増えません。ProfileはRTPの送信解像度を変える設定です。
 
 ## Raspberry Pi 5 実機deploy
 
