@@ -20,14 +20,14 @@ class ProductBuildHookTests(unittest.TestCase):
 
         self.assertIn('"! videoconvert ! video/x-raw,format=I420 "', source)
 
-    def test_local_menu_uses_a_legible_outlined_font_and_jpeg_quality_control(
+    def test_local_menu_uses_a_legible_outlined_normal_font_and_jpeg_quality_control(
         self,
     ) -> None:
         source = (REPOSITORY_ROOT / "sources/gar-stream-tx/camera_tx.py").read_text(
             encoding="utf-8"
         )
 
-        self.assertIn('font-desc="Sans Bold 16"', source)
+        self.assertIn('font-desc="Sans 14"', source)
         self.assertIn("draw-outline=true", source)
         self.assertIn("JPEG_QUALITY_OPTIONS = (60, 75, 85, 95)", source)
 
