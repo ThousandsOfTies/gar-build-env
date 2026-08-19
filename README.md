@@ -25,8 +25,12 @@ gar-build-env/
     setup-product-branch.sh
     product-sim-build.sh.example
     product-target-build.sh.example
+  hardware/              # GarAdhocApp固有の部品・配線・simulation入力CSV
   artifacts/             # generated output, ignored
 ```
+
+`hardware/*.csv` はTarget Packではなく、このProduct branchが所有します。GARは
+workspaceからこのdirectoryを解決し、選択されたsimulation runtimeへ入力します。
 
 ## Setup
 
