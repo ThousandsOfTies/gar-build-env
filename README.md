@@ -118,6 +118,10 @@ artifact storeが観測結果へ付与するため、アプリ環境変数に存
 stageし、出力先に`artifact.json`とdeploy対象fileを作ります。選択Target IDは
 `GAR_TARGET`で渡されるため、対応していないTargetはhook側で明示的に失敗させます。
 
+snapshot capture時にはGARがschema v2 provenanceとchecksumを
+`artifact-info.json`として追加します。Product hookは`artifact-info.json`や旧
+`gar-artifact.json`を生成しません。
+
 Raspberry Pi OS/systemd Targetでは、root管理のserviceやsimulation stubをartifactへ
 含めません。application directory内に実行可能な`run`を置き、Target recipeが用意した
 共通`gar-app@.service`から起動できる形にします。GarStreamTxは
@@ -170,9 +174,8 @@ scripts/product-target-build.sh
 `make build` は `scripts/product-build.sh` があれば実行します。
 `make artifacts` は `scripts/product-artifacts.sh` があれば実行します。
 `gar target build`は`scripts/product-target-build.sh`を直接呼び出します。
-Artifact manifest は製品固有の定義です。必要な製品ブランチで
-`config/artifact-manifest.example.json` を参考に、製品用の設定ファイルや
-`scripts/product-artifacts.sh` を追加してください。
+Artifact manifest は製品固有の定義です。
+`config/artifact-manifest.example.json`は標準`deploy.app`形式の参照例です。
 
 PlatformIO は Python 仮想環境 `~/.venvs/platformio` にインストールされ、
 `~/.bashrc` に PATH が追加されます。
