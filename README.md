@@ -231,3 +231,11 @@ systemctl status gar-app@gar-stream-tx.service --no-pager
 boot時は`gar-app@gar-stream-tx.service`として自動起動します。Target recipeを
 再適用してもSSH鍵や任意の`/etc/gar/gar-stream-tx.env`は消えません。同一LANでは
 RXが自動検出し、network越しではRX側のdiscovery peer設定からTXへqueryします。
+
+## Hardware / Target Pack boundary
+
+Product固有の配線・割当は`hardware/`に置きます。現在のRaspberry Pi 5 profileは
+directory直下、旧RV1106 profileは`hardware/targets/luckfox-rv1106/`です。
+RV1106向けの旧Product制御ロジックと設計メモは`tools/rv1106/`と`docs/rv1106/`へ
+分離しています。toolchain、USB/SSH bring-up、device providerなど再利用可能な
+Target Pack資産だけを`gar-tools`に残します。
