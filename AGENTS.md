@@ -10,7 +10,7 @@ This branch configures the Vibe Remote product devspace.
 - Product source submodule: `sources/gar-vibe-ui`
 - Wokwi template submodule: `sources/gar-tools`
 - Package root: `sources/gar-vibe-ui/vibe-remote`
-- Artifact manifest: `config/artifact-manifest.json`
+- Artifact manifest template: `config/artifact-manifest.json` (`deploy.app`)
 - Install hook: `scripts/product-install.sh`
 - Build hook: `scripts/product-build.sh`
 - Artifact hook: `scripts/product-artifacts.sh`

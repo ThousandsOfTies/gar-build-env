@@ -23,7 +23,7 @@ cp "${package_root}/README.md" "${extension_out}/"
 cp -R "${package_root}/dist" "${extension_out}/dist"
 cp -R "${package_root}/scripts" "${extension_out}/scripts"
 
-firmware_json="null"
+firmware_file="null"
 firmware_artifacts_dir="${package_root}/m5stickc-client/artifacts"
 latest_firmware=""
 if [[ -d "${firmware_artifacts_dir}" ]]; then
@@ -37,10 +37,10 @@ fi
 if [[ -n "${latest_firmware}" ]]; then
   mkdir -p "${firmware_out}"
   cp -R "${latest_firmware}/." "${firmware_out}/"
-  firmware_json='"files/m5stickc-firmware"'
+  firmware_file='{"src":"files/m5stickc-firmware","dest":"~/m5stickc-firmware"}'
 fi
 
-python3 - "${manifest_path}" "${artifact_root}/artifact.json" "${firmware_json}" <<'PY'
+python3 - "${manifest_path}" "${artifact_root}/artifact.json" "${firmware_file}" <<'PY'
 from __future__ import annotations
 
 import json
@@ -49,10 +49,12 @@ from pathlib import Path
 
 manifest_path = Path(sys.argv[1])
 output_path = Path(sys.argv[2])
-firmware_artifact = json.loads(sys.argv[3])
+firmware_file = json.loads(sys.argv[3])
 
 payload = json.loads(manifest_path.read_text(encoding="utf-8"))
-payload.setdefault("deploy", {}).setdefault("m5stickcFirmware", {})["artifact"] = firmware_artifact
+app_files = payload.setdefault("deploy", {}).setdefault("app", {}).setdefault("files", [])
+if firmware_file is not None:
+    app_files.append(firmware_file)
 output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 PY
 

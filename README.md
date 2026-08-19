@@ -45,6 +45,11 @@ scripts/gar sim runtime diag --json
 `gar sim runtime start` は配置済み project を起動します。Wokwi には別の
 runtime artifact がないため、`gar sim runtime build/deploy` は不要です。
 
+Product build hookが生成する`artifact.json`は標準`deploy.app`配置manifestです。
+snapshot capture時にGARがschema v2 provenanceとchecksumを`artifact-info.json`
+として追加するため、Product側は`artifact-info.json`や旧`gar-artifact.json`を
+生成しません。
+
 M5StickC firmware artifact も作る場合:
 
 ```bash
