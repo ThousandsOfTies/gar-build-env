@@ -80,6 +80,10 @@ GaplessAgentRuntime です。製品 branch で simulation build が必要な場�
 `scripts/product-target-build.sh.example`をコピーし、`deploy.app`を持つ
 `artifacts/from-codespace/artifact.json`を生成するbuild commandを定義してください。
 
+`artifact.json`はProductが生成する配置manifestです。snapshot capture時にGARが
+schema v2 provenanceとchecksumを`artifact-info.json`として追加します。Productの
+build hookやtemplateは`artifact-info.json`／旧`gar-artifact.json`を生成しません。
+
 ## Product Branches
 
 製品ブランチでは、共通シーケンスをなるべく触らず、個別定義だけを追加します。
@@ -126,8 +130,8 @@ scripts/product-clean.sh
 `make build` は `scripts/product-build.sh` があれば実行します。
 `make artifacts` は `scripts/product-artifacts.sh` があれば実行します。
 Artifact manifest は製品固有の定義です。必要な製品ブランチで
-`config/artifact-manifest.example.json` を参考に、製品用の設定ファイルや
-`scripts/product-artifacts.sh` を追加してください。
+`config/artifact-manifest.example.json` の標準`deploy.app`形式を参考に、製品用の
+build hookを追加してください。
 
 PlatformIO は Python 仮想環境 `~/.venvs/platformio` にインストールされ、
 `~/.bashrc` に PATH が追加されます。
