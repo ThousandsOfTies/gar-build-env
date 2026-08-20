@@ -1,0 +1,5 @@
+source,source_pin,target,target_pin,signal,description
+pca9685-1,CH0 PWM,sg90-1,signal,PWM,Servo 1 control signal
+pca9685-1,CH1 PWM,sg90-2,signal,PWM,Servo 2 control signal
+pca9685-1,CH2 PWM,sg90-3,signal,PWM,Servo 3 control signal
+pca9685-1,CH3 PWM,sg90-4,signal,PWM,Servo 4 control signal

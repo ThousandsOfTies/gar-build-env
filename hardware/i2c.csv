@@ -1,0 +1,2 @@
+name,bus,dev,address,driver,sim,description
+pca9685-1,1,/dev/i2c-1,0x40,pca9685,pca9685,PCA9685 controller used by the VM simulation

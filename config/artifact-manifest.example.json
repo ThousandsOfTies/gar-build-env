@@ -1,13 +1,13 @@
 {
-  "name": "example-product-target",
-  "target": "target-id",
-  "entrypoint": "/opt/gar/apps/example-product/run",
+  "name": "gar-servo-pet-frdm-imx91s",
+  "target": "frdm-imx91s",
+  "entrypoint": "/opt/gar/apps/gar-servo-pet/run",
   "deploy": {
     "app": {
       "files": [
         {
-          "src": "files/example-product",
-          "dest": "/opt/gar/apps/example-product",
+          "src": "files/gar-servo-pet",
+          "dest": "/opt/gar/apps/gar-servo-pet",
           "mode": "0755"
         }
       ]

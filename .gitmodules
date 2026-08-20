@@ -1,0 +1,6 @@
+[submodule "sources/gar-servo-pet"]
+	path = sources/gar-servo-pet
+	url = https://github.com/ThousandsOfTies/gar-servo-pet
+[submodule "sources/gar-tools"]
+	path = sources/gar-tools
+	url = https://github.com/ThousandsOfTies/gar-tools

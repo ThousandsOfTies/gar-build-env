@@ -1,60 +1,27 @@
-# gar-build-env Agent Rules
+# GarServoPet Agent Rules
 
-This repository is the GAR Codespaces/devcontainer runtime. Product-specific
-configuration lives on long-lived product branches of this repository.
+This repository is the GarServoPet Product root. It owns the reproducible source
+set, Product-specific hardware data, and GAR build/deployment configuration.
 
-## Roles
+## Repository roles
 
-- `main`: common devspace runtime, setup sequence, shared defaults.
-- Product branches: product-specific config, optional `sources/*` submodules,
-  and setup/build hooks.
-- Submodules, when present on a product branch: official editable source
-  repositories, not ignored scratch space.
+- `sources/gar-servo-pet`: application behavior and motion logic.
+- `sources/gar-tools`: reusable target and simulation tooling.
+- `hardware`: GarServoPet-specific components, wiring, servo channel mapping,
+  direction, neutral point, pulse limits, and mechanical calibration.
+- `config`: Product build and artifact configuration.
 
-## Setup Flow
+Do not place Product-specific hardware CSV or calibration data under
+`sources/gar-tools/targets`.
 
-Codespaces runs `scripts/post-create.sh`, which delegates to:
+## Submodule workflow
 
-```text
-scripts/bootstrap.sh
-  scripts/setup-common.sh
-  scripts/setup-product-branch.sh
-```
+Commit and push child repository changes before updating the parent pointer.
+Do not treat submodules as generated or disposable directories.
 
-`setup-product-branch.sh` is the common product-branch dispatcher. It is
-intentionally optional-file friendly:
+## Artifact ownership
 
-```bash
-[ -f config/product.env ] && source config/product.env
-[ -f .gitmodules ] && git submodule update --init --recursive
-[ -x scripts/product-install.sh ] && scripts/product-install.sh
-```
+Product hooks generate `artifact.json` with `deploy.app`. GAR alone generates
+the schema-v2 `artifact-info.json` provenance and checksum metadata.
 
-## Product Branches
-
-Do not add product-specific source repositories to `main`. Put each product's
-repository set, config, and setup/build hooks on that product's branch.
-Artifact manifests are product-specific config, not shared runtime code. Use
-`config/artifact-manifest.example.json` as a `deploy.app` template when a
-product branch needs a deploy manifest. Product hooks write `artifact.json`;
-GAR alone adds schema-v2 `artifact-info.json` snapshot metadata.
-
-## Submodule Edits
-
-On product branches that use submodules, commit and push the child repository
-first, then commit the parent submodule pointer.
-
-```bash
-cd path/to/submodule
-git add -A
-git commit -m "Describe child repo change"
-git push
-
-cd path/to/gar-build-env
-git add path/to/submodule
-git commit -m "Update <repo> submodule pointer"
-git push
-```
-
-Do not treat product-branch submodules as disposable generated directories. They
-are canonical product repositories for AI-assisted edits.
+Generated artifacts are not committed.

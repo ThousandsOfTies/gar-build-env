@@ -1,0 +1,6 @@
+component_id,name,kind,part_number,description
+pca9685-1,PCA9685 16-channel PWM controller,controller,PCA9685,Servo controller module
+sg90-1,SG90 micro servo 1,actuator,SG90,Individually connected servo motor
+sg90-2,SG90 micro servo 2,actuator,SG90,Individually connected servo motor
+sg90-3,SG90 micro servo 3,actuator,SG90,Individually connected servo motor
+sg90-4,SG90 micro servo 4,actuator,SG90,Individually connected servo motor
