@@ -63,11 +63,16 @@ before updating its submodule pointer here.
 ## GAR artifact contract
 
 `config/artifact-manifest.example.json` uses the current Product-owned
-`artifact.json` format with `deploy.app`. GAR adds `artifact-info.json` when it
-captures the resulting artifact snapshot.
+`artifact.json` format with `deploy.app` and a full-image `deploy.image`
+section. The IMX91S UUU Target consumes the latter; GAR adds `artifact-info.json`
+when it captures the resulting artifact snapshot.
 
-The example target id is `frdm-imx91s`. A reusable Target Pack for that board
-still needs to be added to `gar-tools` before physical deployment is enabled.
+The example target id is `frdm-imx91s`. Select the target backend in `gar setup`
+or the workspace configuration; the Target Pack chooses UUU, SSH, or another
+registered backend through `defaultBackends.target`.
+
+For USB-C boot verification, set the workspace `target.serial` to the first
+CH343 debug-UART device (for example `/dev/ttyCH343USB0`).
 
 ## Current status
 

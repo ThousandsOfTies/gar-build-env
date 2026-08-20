@@ -11,6 +11,14 @@
           "mode": "0755"
         }
       ]
+    },
+    "image": {
+      "files": [
+        {
+          "src": "images/gar-servo-pet.wic.zst",
+          "dest": "gar-servo-pet.wic.zst"
+        }
+      ]
     }
   }
 }
