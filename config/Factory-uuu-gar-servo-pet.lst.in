@@ -63,4 +63,4 @@ FBK: ucmd mount @@DISK@@p@@STORAGE_PART@@ /mnt/gar-storage
 FBK: ucmd mkdir -p /mnt/gar-storage/gar-servo-pet
 FBK: ucmd sync
 FBK: ucmd umount /mnt/gar-storage
-FBK: ucmd reboot
+FBK: acmd reboot
