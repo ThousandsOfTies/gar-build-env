@@ -15,8 +15,28 @@
     "image": {
       "files": [
         {
-          "src": "images/gar-servo-pet.wic.zst",
-          "dest": "gar-servo-pet.wic.zst"
+          "src": "Factory-uuu-gar-servo-pet.lst",
+          "dest": "Factory-uuu-gar-servo-pet.lst"
+        }
+      ]
+    },
+    "uuu": {
+      "files": [
+        {
+          "src": "pub/u-boot/flash_gar_servo_pet.bin",
+          "dest": "pub/u-boot/flash_gar_servo_pet.bin"
+        },
+        {
+          "src": "pub/rootfs/rootfs.squashfs",
+          "dest": "pub/rootfs/rootfs.squashfs"
+        },
+        {
+          "src": "pub/rootfs/usr.local.tar.bz2",
+          "dest": "pub/rootfs/usr.local.tar.bz2"
+        },
+        {
+          "src": "pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst",
+          "dest": "pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst"
         }
       ]
     }

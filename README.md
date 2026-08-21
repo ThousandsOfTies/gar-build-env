@@ -63,9 +63,24 @@ before updating its submodule pointer here.
 ## GAR artifact contract
 
 `config/artifact-manifest.example.json` uses the current Product-owned
-`artifact.json` format with `deploy.app` and a full-image `deploy.image`
-section. The IMX91S UUU Target consumes the latter; GAR adds `artifact-info.json`
-when it captures the resulting artifact snapshot.
+`artifact.json` format with `deploy.app`, a single factory UUU script in
+`deploy.image`, and the script's component files in `deploy.uuu`. The IMX91S
+UUU Target executes the script from the artifact root; GAR adds
+`artifact-info.json` when it captures the resulting artifact snapshot.
+
+The intended IMX91S artifact shape is:
+
+```text
+Factory-uuu-gar-servo-pet.lst
+pub/u-boot/flash_gar_servo_pet.bin
+pub/rootfs/rootfs.squashfs
+pub/rootfs/usr.local.tar.bz2
+pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst
+```
+
+This is deliberately component-based rather than a single `.wic` image. The
+UUU script must be board-specific: it owns the SDP/FBK sequence, partition
+numbers, overlay/storage mounts, and factory updater initialization.
 
 The example target id is `frdm-imx91s`. Select the target backend in `gar setup`
 or the workspace configuration; the Target Pack chooses UUU, SSH, or another
