@@ -1,0 +1,7 @@
+TIMEOUT 1
+DEFAULT gar-servo-pet
+
+LABEL gar-servo-pet
+  KERNEL /Image
+  FDT /imx91-11x11-frdm-imx91s.dtb
+  APPEND root=/dev/mmcblk0p2 rootfstype=squashfs ro rootwait

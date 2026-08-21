@@ -73,14 +73,44 @@ The intended IMX91S artifact shape is:
 ```text
 Factory-uuu-gar-servo-pet.lst
 pub/u-boot/flash_gar_servo_pet.bin
+pub/kernel/Image
+pub/kernel/imx91-11x11-frdm-imx91s.dtb
+pub/kernel/extlinux.conf
 pub/rootfs/rootfs.squashfs
 pub/rootfs/usr.local.tar.bz2
 pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst
+pub/layout/gar-servo-pet.sfdisk
 ```
 
 This is deliberately component-based rather than a single `.wic` image. The
 UUU script must be board-specific: it owns the SDP/FBK sequence, partition
-numbers, overlay/storage mounts, and factory updater initialization.
+numbers, overlay/storage mounts, and factory updater initialization. The
+kernel/DTB are transferred with the current UUU `FB:` commands to boot the
+manufacturing initramfs; only then does the script use `FBK:` to write the
+components. The layout file is intentionally a Product input and must be
+verified against the physical eMMC before a real write is enabled.
+
+The repository contains a generator and staging helper for this shape:
+
+```bash
+cp config/imx91s-uuu.env.example config/imx91s-uuu.env
+# Edit the layout and set GAR_IMX91S_LAYOUT_CONFIRMED=1 only after checking it.
+scripts/generate-imx91s-uuu.sh --config config/imx91s-uuu.env --allow-unconfirmed
+scripts/stage-imx91s-uuu.sh --input-dir /path/to/built-components \
+  --config config/imx91s-uuu.env --allow-unconfirmed
+```
+
+`--allow-unconfirmed` is for producing a dry-run bundle only; the stage helper
+refuses a physical deployment unless the layout is explicitly confirmed.
+
+The component build follows the NXP BSP values already checked into the local
+build notes: U-Boot `lf_v2024.04` with
+`imx91_11x11_frdm_imx91s_inline_ecc_defconfig`, Linux `lf-6.6.y` with the
+FRDM-IMX91S DT patches, ATF `lf_v2.8`, and imx-mkimage
+`lf-6.6.3_1.0.0`. The four LPDDR4 training binaries and NXP ELE firmware are
+inputs to `flash_singleboot`; they are not invented or copied from the
+Stella2 product. Build output can therefore be produced independently and
+then staged into the UUU tree above.
 
 The example target id is `frdm-imx91s`. Select the target backend in `gar setup`
 or the workspace configuration; the Target Pack chooses UUU, SSH, or another

@@ -1,0 +1,13 @@
+# Example only.  Do not flash this file without checking the eMMC capacity,
+# bootloader seek, and the U-Boot/Linux device numbering on the actual board.
+# The first 8 MiB is reserved for the i.MX boot container; p1 is the boot
+# partition, p2 is the raw SquashFS root, p3 is the writable overlay, and p4 is
+# persistent product storage.
+label: dos
+unit: sectors
+first-lba: 2048
+
+start=16384,  size=131072,  type=c, bootable
+start=147456, size=1048576, type=83
+start=1196032, size=1048576, type=83
+start=2244608, type=83
