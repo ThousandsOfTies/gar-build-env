@@ -117,7 +117,8 @@ or the workspace configuration; the Target Pack chooses UUU, SSH, or another
 registered backend through `defaultBackends.target`.
 
 For USB-C boot verification, set the workspace `target.serial` to the first
-CH343 debug-UART device (for example `/dev/ttyCH343USB0`).
+CH342/CH343 debug-UART device. With the observed WSL2 adapter this is usually
+`/dev/ttyACM0` (the second channel is `/dev/ttyACM1`).
 
 ## Current status
 
