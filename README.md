@@ -99,19 +99,25 @@ mode `0755`. The UUU command list verifies those attributes before reporting
 completion. This prevents a host build UID from causing systemd-tmpfiles to
 reject `/var`, `/tmp`, and `/run` as unsafe path transitions on first boot.
 
-The repository contains a generator and staging helper for this shape:
+The reusable implementation is owned by the `frdm-imx91s` Target Pack. These
+Product scripts are compatibility wrappers which supply GarServoPet filenames,
+configuration, and output locations:
 
 ```bash
 cp config/imx91s-uuu.env.example config/imx91s-uuu.env
-# Run the read-only probe, then confirm the observed MTD names and sizes.
-scripts/generate-imx91s-uuu.sh --config config/imx91s-uuu.env --allow-unconfirmed
+# Generate and execute the read-only probe, then confirm its MTD table.
+scripts/generate-imx91s-layout-probe.sh --config config/imx91s-uuu.env --validate
+# Set GAR_IMX91S_NAND_LAYOUT_CONFIRMED=1 only after that confirmation.
 scripts/stage-imx91s-uuu.sh --input-dir /path/to/built-components \
-  --config config/imx91s-uuu.env --allow-unconfirmed
+  --config config/imx91s-uuu.env --validate
 ```
 
 `--allow-unconfirmed` produces a review bundle with a U-Boot `test 0 = 1`
 command before the first NAND write. Set
 `GAR_IMX91S_NAND_LAYOUT_CONFIRMED=1` only after the probe agrees with the DTS.
+The generic implementation, board bring-up record, and troubleshooting matrix
+are under `sources/gar-tools/targets/frdm-imx91s/`; Product-specific servo and
+application information remains outside the Target Pack.
 
 The component build follows the NXP BSP values already checked into the local
 build notes: U-Boot `lf_v2024.04` with
@@ -161,9 +167,9 @@ usbipd attach --wsl --busid 4-3 --auto-attach
 
 ## Current status
 
-The repositories and ownership boundaries are initialized. Servo roles,
-mechanical layout, PCA9685 bus/address selection, pulse limits, and power design
-remain explicit design decisions for the next step.
+The SPI-NAND factory path has been validated on hardware through NAND boot and
+first-login service checks. Its reusable implementation is pinned through the
+`gar-tools` submodule; generated artifacts remain ignored.
 
 The browser simulator currently represents one PCA9685 board and four
 individually identified SG90 servos. It intentionally does not render the FRDM-IMX91S: the VM and
