@@ -59,6 +59,7 @@ FBK: ucmd command -v ubiformat
 FBK: ucmd command -v ubiattach
 FBK: ucmd command -v ubidetach
 FBK: ucmd command -v ubimkvol
+FBK: ucmd command -v stat
 
 # Stage source files in RAM, then erase and program the raw kernel/DTB MTDs.
 FBK: ucp pub/kernel/Image t:/tmp/gar-Image
@@ -86,6 +87,9 @@ FBK: ucmd tar -xojf /tmp/gar-usr.local.tar.bz2 -C /mnt/gar-rootfs
 # Normalize / explicitly so systemd-tmpfiles accepts all path transitions.
 FBK: ucmd chown 0:0 /mnt/gar-rootfs
 FBK: ucmd chmod 0755 /mnt/gar-rootfs
+FBK: ucmd test "$(stat -c %u:%g /mnt/gar-rootfs)" = 0:0
+FBK: ucmd test "$(stat -c %a /mnt/gar-rootfs)" = 755
+FBK: ucmd test "$(stat -c %u:%g /mnt/gar-rootfs/usr/local)" = 0:0
 FBK: ucmd sync
 FBK: ucmd umount /mnt/gar-rootfs
 FBK: ucmd umount /mnt/gar-source

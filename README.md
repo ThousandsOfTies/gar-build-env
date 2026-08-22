@@ -93,6 +93,12 @@ writable UBIFS `rootfs` volume from the Product SquashFS. The MTD indices and
 names must match the fixed partitions in `imx91-11x11-frdm-imx91s.dts` before
 a real write is enabled.
 
+The UBIFS expansion deliberately ignores ownership stored in the Product
+overlay archive and normalizes the deployed filesystem root to `root:root`
+mode `0755`. The UUU command list verifies those attributes before reporting
+completion. This prevents a host build UID from causing systemd-tmpfiles to
+reject `/var`, `/tmp`, and `/run` as unsafe path transitions on first boot.
+
 The repository contains a generator and staging helper for this shape:
 
 ```bash
