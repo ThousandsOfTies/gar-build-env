@@ -91,6 +91,7 @@ fi
 : "${GAR_UUU_TRANSFER_TIMEOUT_MS:=30000}"
 : "${GAR_IMX91S_FASTBOOT_BUFFER:=0x82800000}"
 : "${GAR_UUU_TRANSFER_CHUNK_SIZE:=0x100000}"
+: "${GAR_IMX91S_INITRD_ADDR:=0x85000000}"
 : "${GAR_IMX91S_DTB:=imx91-11x11-frdm-imx91s.dtb}"
 : "${GAR_IMX91S_DISK:=/dev/mmcblk0}"
 : "${GAR_IMX91S_BOOT_PART:=1}"
@@ -109,6 +110,7 @@ for value_name in \
   GAR_UUU_TRANSFER_TIMEOUT_MS \
   GAR_IMX91S_FASTBOOT_BUFFER \
   GAR_UUU_TRANSFER_CHUNK_SIZE \
+  GAR_IMX91S_INITRD_ADDR \
   GAR_IMX91S_DTB \
   GAR_IMX91S_DISK \
   GAR_IMX91S_BOOT_PART \
@@ -126,7 +128,7 @@ if [[ ! "$GAR_UUU_TRANSFER_TIMEOUT_MS" =~ ^[1-9][0-9]*$ ]]; then
   echo "GAR_UUU_TRANSFER_TIMEOUT_MS must be a positive integer: $GAR_UUU_TRANSFER_TIMEOUT_MS" >&2
   exit 1
 fi
-for hex_value_name in GAR_IMX91S_FASTBOOT_BUFFER GAR_UUU_TRANSFER_CHUNK_SIZE; do
+for hex_value_name in GAR_IMX91S_FASTBOOT_BUFFER GAR_UUU_TRANSFER_CHUNK_SIZE GAR_IMX91S_INITRD_ADDR; do
   if [[ ! "${!hex_value_name}" =~ ^0x[0-9A-Fa-f]+$ ]]; then
     echo "${hex_value_name} must be a hexadecimal UUU value: ${!hex_value_name}" >&2
     exit 1
@@ -156,6 +158,7 @@ echo "UUU version:     $GAR_UUU_VERSION"
 echo "Transfer timeout: ${GAR_UUU_TRANSFER_TIMEOUT_MS} ms"
 echo "Fastboot buffer:  ${GAR_IMX91S_FASTBOOT_BUFFER}"
 echo "Transfer chunk:   ${GAR_UUU_TRANSFER_CHUNK_SIZE}"
+echo "Initrd address:    ${GAR_IMX91S_INITRD_ADDR}"
 echo "DTB:             $GAR_IMX91S_DTB"
 echo "Linux disk:      $GAR_IMX91S_DISK"
 echo "Partitions:      boot=$GAR_IMX91S_BOOT_PART rootfs=$GAR_IMX91S_ROOTFS_PART overlay=$GAR_IMX91S_OVERLAY_PART storage=$GAR_IMX91S_STORAGE_PART"
@@ -224,6 +227,7 @@ replace_token UUU_VERSION "$GAR_UUU_VERSION"
 replace_token TRANSFER_TIMEOUT_MS "$GAR_UUU_TRANSFER_TIMEOUT_MS"
 replace_token FASTBOOT_BUFFER "$GAR_IMX91S_FASTBOOT_BUFFER"
 replace_token TRANSFER_CHUNK_SIZE "$GAR_UUU_TRANSFER_CHUNK_SIZE"
+replace_token INITRD_ADDR "$GAR_IMX91S_INITRD_ADDR"
 replace_token KERNEL_TRANSFER "$kernel_transfer"
 replace_token DTB_TRANSFER "$dtb_transfer"
 replace_token INITRD_TRANSFER "$initrd_transfer"

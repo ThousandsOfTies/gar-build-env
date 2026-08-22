@@ -77,13 +77,14 @@ fi
 : "${GAR_UUU_TRANSFER_TIMEOUT_MS:=30000}"
 : "${GAR_IMX91S_FASTBOOT_BUFFER:=0x82800000}"
 : "${GAR_UUU_TRANSFER_CHUNK_SIZE:=0x100000}"
+: "${GAR_IMX91S_INITRD_ADDR:=0x85000000}"
 : "${GAR_IMX91S_DTB:=imx91-11x11-frdm-imx91s.dtb}"
 
 if [[ ! "$GAR_UUU_TRANSFER_TIMEOUT_MS" =~ ^[1-9][0-9]*$ ]]; then
   echo "GAR_UUU_TRANSFER_TIMEOUT_MS must be a positive integer: $GAR_UUU_TRANSFER_TIMEOUT_MS" >&2
   exit 1
 fi
-for hex_value_name in GAR_IMX91S_FASTBOOT_BUFFER GAR_UUU_TRANSFER_CHUNK_SIZE; do
+for hex_value_name in GAR_IMX91S_FASTBOOT_BUFFER GAR_UUU_TRANSFER_CHUNK_SIZE GAR_IMX91S_INITRD_ADDR; do
   if [[ ! "${!hex_value_name}" =~ ^0x[0-9A-Fa-f]+$ ]]; then
     echo "${hex_value_name} must be a hexadecimal UUU value: ${!hex_value_name}" >&2
     exit 1
@@ -160,9 +161,9 @@ FB: ucmd setenv fastboot_buffer ${GAR_IMX91S_FASTBOOT_BUFFER}
 FB[-t ${GAR_UUU_TRANSFER_TIMEOUT_MS}]: write -f ${dtb_transfer} -format "setexpr gar_copy_dst \${fdt_addr_r} + @off; cp.b \${fastboot_buffer} \${gar_copy_dst} @size" -blksz 1 -each ${GAR_UUU_TRANSFER_CHUNK_SIZE}
 FB: ucmd setenv gar_dtb_size ${dtb_size}
 
-FB: ucmd setenv gar_initrd_addr \${initrd_addr}
+FB: ucmd setenv gar_initrd_addr ${GAR_IMX91S_INITRD_ADDR}
 FB: ucmd setenv fastboot_buffer ${GAR_IMX91S_FASTBOOT_BUFFER}
-FB[-t ${GAR_UUU_TRANSFER_TIMEOUT_MS}]: write -f ${initrd_transfer} -format "setexpr gar_copy_dst \${initrd_addr} + @off; cp.b \${fastboot_buffer} \${gar_copy_dst} @size" -blksz 1 -each ${GAR_UUU_TRANSFER_CHUNK_SIZE}
+FB[-t ${GAR_UUU_TRANSFER_TIMEOUT_MS}]: write -f ${initrd_transfer} -format "setexpr gar_copy_dst \${gar_initrd_addr} + @off; cp.b \${fastboot_buffer} \${gar_copy_dst} @size" -blksz 1 -each ${GAR_UUU_TRANSFER_CHUNK_SIZE}
 FB: ucmd setenv gar_initrd_size ${initrd_size}
 FB: ucmd run mfgtool_args
 FB: ucmd iminfo \${gar_initrd_addr}

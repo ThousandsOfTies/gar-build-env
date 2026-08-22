@@ -129,6 +129,11 @@ Override the transfer timeout or chunk size with
 `GAR_UUU_TRANSFER_TIMEOUT_MS`/`GAR_UUU_TRANSFER_CHUNK_SIZE` in the local UUU
 environment if the host link is slower.
 
+The manufacturing initramfs is loaded at `GAR_IMX91S_INITRD_ADDR` (default
+`0x85000000`). The U-Boot default `0x83800000` is not used because this image
+extends across the FRDM-IMX91S ELE reserved range at `0x84120000`, which causes
+the S400 fuse driver to fault during Linux device probing.
+
 The example target id is `frdm-imx91s`. Select the target backend in `gar setup`
 or the workspace configuration; the Target Pack chooses UUU, SSH, or another
 registered backend through `defaultBackends.target`.
