@@ -154,6 +154,11 @@ if grep -Eq '@@[A-Z0-9_]+@@' "$output"; then
   exit 1
 fi
 
+if [[ "$(sed -n '1p' "$output")" != "uuu_version "* ]]; then
+  echo "UUU command list must begin with uuu_version: $output" >&2
+  exit 1
+fi
+
 if ((validate)); then
   uuu_bin="${GAR_UUU_BIN:-}"
   if [[ -z "$uuu_bin" ]]; then

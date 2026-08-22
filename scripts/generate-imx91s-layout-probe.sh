@@ -92,10 +92,11 @@ done
 
 mkdir -p "$(dirname "$output")"
 cat > "$output" <<EOF
+uuu_version ${GAR_UUU_VERSION}
+
 # Read-only FRDM-IMX91S eMMC layout probe.
 # This script boots Linux into RAM and only prints information. It does not
 # partition, format, mount, or write the target eMMC.
-uuu_version ${GAR_UUU_VERSION}
 
 SDPS[-t 10000]: boot -scanterm -f pub/u-boot/flash_gar_servo_pet.bin -scanlimited 0x800000
 
@@ -133,6 +134,11 @@ FBK: ucmd cat /sys/block/mmcblk1/device/type || true
 FBK: ucmd echo GAR_IMX91S_LAYOUT_PROBE_END
 FBK: acmd reboot
 EOF
+
+if [[ "$(sed -n '1p' "$output")" != "uuu_version "* ]]; then
+  echo "generated UUU command list must begin with uuu_version: $output" >&2
+  exit 1
+fi
 
 if ((validate)); then
   uuu_bin="${GAR_UUU_BIN:-}"

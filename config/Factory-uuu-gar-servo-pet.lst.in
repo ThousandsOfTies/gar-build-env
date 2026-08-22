@@ -1,3 +1,6 @@
+uuu_version @@UUU_VERSION@@
+
+# UUU command-list files must start with the version declaration.
 # Generated for GarServoPet / NXP FRDM-IMX91S.
 #
 # This is intentionally a component flow.  It boots the NXP manufacturing
@@ -6,8 +9,6 @@
 #
 # Do not copy partition numbers from another product.  The generator keeps
 # this file behind GAR_IMX91S_LAYOUT_CONFIRMED for that reason.
-uuu_version @@UUU_VERSION@@
-
 # i.MX91 is an SDPS ROM device with current UUU releases.
 SDPS[-t 10000]: boot -scanterm -f pub/u-boot/flash_gar_servo_pet.bin -scanlimited 0x800000
 
