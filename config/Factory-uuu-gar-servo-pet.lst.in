@@ -13,22 +13,25 @@ uuu_version @@UUU_VERSION@@
 SDPS[-t 10000]: boot -scanterm -f pub/u-boot/flash_gar_servo_pet.bin -scanlimited 0x800000
 
 # Load the manufacturing Linux kernel, DTB, and initramfs through U-Boot.
-# fastboot_bytes is captured immediately after each download because the next
-# download may use a different buffer address.
+# Use chunked FB: write commands instead of FB: download: older UUU releases
+# use a fixed short libusb timeout in FBDownload, while FB: write honors the
+# per-command timeout.  Each chunk is copied from the fastboot staging buffer
+# into the final boot address.  @off is a byte offset supplied by FB: write;
+# setexpr turns it into the destination address before cp.b runs.
 FB: ucmd setenv gar_kernel_addr ${loadaddr}
-FB: ucmd setenv fastboot_buffer ${loadaddr}
-FB[-t @@TRANSFER_TIMEOUT_MS@@]: download -f pub/kernel/Image
-FB: ucmd setenv gar_kernel_size ${fastboot_bytes}
+FB: ucmd setenv fastboot_buffer @@FASTBOOT_BUFFER@@
+FB[-t @@TRANSFER_TIMEOUT_MS@@]: write -f pub/kernel/Image -format "setexpr gar_copy_dst ${loadaddr} + @off; cp.b ${fastboot_buffer} ${gar_copy_dst} @size" -blksz 1 -each @@TRANSFER_CHUNK_SIZE@@
+FB: ucmd setenv gar_kernel_size @@KERNEL_SIZE@@
 
 FB: ucmd setenv gar_dtb_addr ${fdt_addr_r}
-FB: ucmd setenv fastboot_buffer ${fdt_addr_r}
-FB[-t @@TRANSFER_TIMEOUT_MS@@]: download -f pub/kernel/@@DTB@@
-FB: ucmd setenv gar_dtb_size ${fastboot_bytes}
+FB: ucmd setenv fastboot_buffer @@FASTBOOT_BUFFER@@
+FB[-t @@TRANSFER_TIMEOUT_MS@@]: write -f pub/kernel/@@DTB@@ -format "setexpr gar_copy_dst ${fdt_addr_r} + @off; cp.b ${fastboot_buffer} ${gar_copy_dst} @size" -blksz 1 -each @@TRANSFER_CHUNK_SIZE@@
+FB: ucmd setenv gar_dtb_size @@DTB_SIZE@@
 
-FB: ucmd setenv gar_initrd_addr ${ramdisk_addr_r}
-FB: ucmd setenv fastboot_buffer ${ramdisk_addr_r}
-FB[-t @@TRANSFER_TIMEOUT_MS@@]: download -f pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst
-FB: ucmd setenv gar_initrd_size ${fastboot_bytes}
+FB: ucmd setenv gar_initrd_addr ${initrd_addr}
+FB: ucmd setenv fastboot_buffer @@FASTBOOT_BUFFER@@
+FB[-t @@TRANSFER_TIMEOUT_MS@@]: write -f pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst -format "setexpr gar_copy_dst ${initrd_addr} + @off; cp.b ${fastboot_buffer} ${gar_copy_dst} @size" -blksz 1 -each @@TRANSFER_CHUNK_SIZE@@
+FB: ucmd setenv gar_initrd_size @@INITRD_SIZE@@
 FB: acmd booti ${gar_kernel_addr} ${gar_initrd_addr}:${gar_initrd_size} ${gar_dtb_addr}
 
 # The initramfs must provide the NXP imx-uuc/linuxrc endpoint.  All following
