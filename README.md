@@ -121,9 +121,10 @@ short fixed bulk timeout used by the older `FB: download` implementation and
 copies each chunk into the correct RAM offset before booting Linux. The
 generator also creates transfer-only copies under `pub/uuu-ram`, zero-padded
 to the chunk boundary. This prevents the deterministic Fastboot timeout seen
-on the final short chunk while retaining the original kernel, DTB, and initrd
-sizes for `booti`. The command-line option `uuu -T` only controls waiting for
-a USB device at a stage change.
+on the final short chunk. The manufacturing initramfs remains a legacy U-Boot
+ramdisk, so its header retains the authoritative payload size passed through
+`booti`. The command-line option `uuu -T` only controls waiting for a USB
+device at a stage change.
 Override the transfer timeout or chunk size with
 `GAR_UUU_TRANSFER_TIMEOUT_MS`/`GAR_UUU_TRANSFER_CHUNK_SIZE` in the local UUU
 environment if the host link is slower.

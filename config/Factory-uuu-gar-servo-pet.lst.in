@@ -17,8 +17,8 @@ SDPS[-t 10000]: boot -scanterm -f pub/u-boot/flash_gar_servo_pet.bin -scanlimite
 # use a fixed short libusb timeout in FBDownload, while FB: write honors the
 # per-command timeout. Transfer-only copies are zero-padded to the chunk
 # boundary because the observed WSL/U-Boot Fastboot path deterministically
-# stalls on the final short chunk. The original byte sizes below remain the
-# authoritative sizes passed to booti.
+# stalls on the final short chunk. The original byte sizes below remain
+# available for diagnostics; the legacy ramdisk header remains authoritative.
 #
 # Each chunk is copied from the fastboot staging buffer into the final boot
 # address. @off is a byte offset supplied by FB: write; setexpr turns it into
@@ -37,9 +37,13 @@ FB: ucmd setenv gar_initrd_addr ${initrd_addr}
 FB: ucmd setenv fastboot_buffer @@FASTBOOT_BUFFER@@
 FB[-t @@TRANSFER_TIMEOUT_MS@@]: write -f @@INITRD_TRANSFER@@ -format "setexpr gar_copy_dst ${initrd_addr} + @off; cp.b ${fastboot_buffer} ${gar_copy_dst} @size" -blksz 1 -each @@TRANSFER_CHUNK_SIZE@@
 FB: ucmd setenv gar_initrd_size @@INITRD_SIZE@@
+# Follow bootcmd_mfg: set rdinit=/linuxrc, validate the legacy U-Boot ramdisk,
+# and pass its address (without :size) to booti.
+FB: ucmd run mfgtool_args
+FB: ucmd iminfo ${gar_initrd_addr}
 # Fastboot ACmd has a short command-length limit. Store the full command via
 # UCmd, then asynchronously execute only the short environment-variable name.
-FB: ucmd setenv gar_bootcmd booti ${gar_kernel_addr} ${gar_initrd_addr}:${gar_initrd_size} ${gar_dtb_addr}
+FB: ucmd setenv gar_bootcmd booti ${gar_kernel_addr} ${gar_initrd_addr} ${gar_dtb_addr}
 FB: acmd run gar_bootcmd
 
 # The initramfs must provide the NXP imx-uuc/linuxrc endpoint.  All following
