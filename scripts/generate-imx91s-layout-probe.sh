@@ -74,7 +74,13 @@ elif [[ "$config_file" != "${repo_root}/config/imx91s-uuu.env" ]]; then
 fi
 
 : "${GAR_UUU_VERSION:=1.5.243}"
+: "${GAR_UUU_TRANSFER_TIMEOUT_MS:=30000}"
 : "${GAR_IMX91S_DTB:=imx91-11x11-frdm-imx91s.dtb}"
+
+if [[ ! "$GAR_UUU_TRANSFER_TIMEOUT_MS" =~ ^[1-9][0-9]*$ ]]; then
+  echo "GAR_UUU_TRANSFER_TIMEOUT_MS must be a positive integer: $GAR_UUU_TRANSFER_TIMEOUT_MS" >&2
+  exit 1
+fi
 
 required_files=(
   "pub/u-boot/flash_gar_servo_pet.bin"
@@ -102,17 +108,17 @@ SDPS[-t 10000]: boot -scanterm -f pub/u-boot/flash_gar_servo_pet.bin -scanlimite
 
 FB: ucmd setenv gar_kernel_addr \${loadaddr}
 FB: ucmd setenv fastboot_buffer \${loadaddr}
-FB: download -f pub/kernel/Image
+FB[-t ${GAR_UUU_TRANSFER_TIMEOUT_MS}]: download -f pub/kernel/Image
 FB: ucmd setenv gar_kernel_size \${fastboot_bytes}
 
 FB: ucmd setenv gar_dtb_addr \${fdt_addr_r}
 FB: ucmd setenv fastboot_buffer \${fdt_addr_r}
-FB: download -f pub/kernel/${GAR_IMX91S_DTB}
+FB[-t ${GAR_UUU_TRANSFER_TIMEOUT_MS}]: download -f pub/kernel/${GAR_IMX91S_DTB}
 FB: ucmd setenv gar_dtb_size \${fastboot_bytes}
 
 FB: ucmd setenv gar_initrd_addr \${ramdisk_addr_r}
 FB: ucmd setenv fastboot_buffer \${ramdisk_addr_r}
-FB: download -f pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst
+FB[-t ${GAR_UUU_TRANSFER_TIMEOUT_MS}]: download -f pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst
 FB: ucmd setenv gar_initrd_size \${fastboot_bytes}
 FB: acmd booti \${gar_kernel_addr} \${gar_initrd_addr}:\${gar_initrd_size} \${gar_dtb_addr}
 

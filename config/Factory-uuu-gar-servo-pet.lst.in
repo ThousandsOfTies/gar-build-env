@@ -17,17 +17,17 @@ SDPS[-t 10000]: boot -scanterm -f pub/u-boot/flash_gar_servo_pet.bin -scanlimite
 # download may use a different buffer address.
 FB: ucmd setenv gar_kernel_addr ${loadaddr}
 FB: ucmd setenv fastboot_buffer ${loadaddr}
-FB: download -f pub/kernel/Image
+FB[-t @@TRANSFER_TIMEOUT_MS@@]: download -f pub/kernel/Image
 FB: ucmd setenv gar_kernel_size ${fastboot_bytes}
 
 FB: ucmd setenv gar_dtb_addr ${fdt_addr_r}
 FB: ucmd setenv fastboot_buffer ${fdt_addr_r}
-FB: download -f pub/kernel/@@DTB@@
+FB[-t @@TRANSFER_TIMEOUT_MS@@]: download -f pub/kernel/@@DTB@@
 FB: ucmd setenv gar_dtb_size ${fastboot_bytes}
 
 FB: ucmd setenv gar_initrd_addr ${ramdisk_addr_r}
 FB: ucmd setenv fastboot_buffer ${ramdisk_addr_r}
-FB: download -f pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst
+FB[-t @@TRANSFER_TIMEOUT_MS@@]: download -f pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst
 FB: ucmd setenv gar_initrd_size ${fastboot_bytes}
 FB: acmd booti ${gar_kernel_addr} ${gar_initrd_addr}:${gar_initrd_size} ${gar_dtb_addr}
 

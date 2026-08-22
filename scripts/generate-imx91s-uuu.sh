@@ -81,6 +81,7 @@ elif [[ "$config_file" != "${repo_root}/config/imx91s-uuu.env" ]]; then
 fi
 
 : "${GAR_UUU_VERSION:=1.5.243}"
+: "${GAR_UUU_TRANSFER_TIMEOUT_MS:=30000}"
 : "${GAR_IMX91S_DTB:=imx91-11x11-frdm-imx91s.dtb}"
 : "${GAR_IMX91S_DISK:=/dev/mmcblk0}"
 : "${GAR_IMX91S_BOOT_PART:=1}"
@@ -92,6 +93,7 @@ fi
 
 for value_name in \
   GAR_UUU_VERSION \
+  GAR_UUU_TRANSFER_TIMEOUT_MS \
   GAR_IMX91S_DTB \
   GAR_IMX91S_DISK \
   GAR_IMX91S_BOOT_PART \
@@ -104,6 +106,11 @@ for value_name in \
     exit 1
   fi
 done
+
+if [[ ! "$GAR_UUU_TRANSFER_TIMEOUT_MS" =~ ^[1-9][0-9]*$ ]]; then
+  echo "GAR_UUU_TRANSFER_TIMEOUT_MS must be a positive integer: $GAR_UUU_TRANSFER_TIMEOUT_MS" >&2
+  exit 1
+fi
 
 if [[ ! -f "$template" ]]; then
   echo "missing UUU template: $template" >&2
@@ -120,6 +127,7 @@ EOF
 fi
 
 echo "UUU version:     $GAR_UUU_VERSION"
+echo "Transfer timeout: ${GAR_UUU_TRANSFER_TIMEOUT_MS} ms"
 echo "DTB:             $GAR_IMX91S_DTB"
 echo "Linux disk:      $GAR_IMX91S_DISK"
 echo "Partitions:      boot=$GAR_IMX91S_BOOT_PART rootfs=$GAR_IMX91S_ROOTFS_PART overlay=$GAR_IMX91S_OVERLAY_PART storage=$GAR_IMX91S_STORAGE_PART"
@@ -142,6 +150,7 @@ replace_token() {
 }
 
 replace_token UUU_VERSION "$GAR_UUU_VERSION"
+replace_token TRANSFER_TIMEOUT_MS "$GAR_UUU_TRANSFER_TIMEOUT_MS"
 replace_token DTB "$GAR_IMX91S_DTB"
 replace_token DISK "$GAR_IMX91S_DISK"
 replace_token BOOT_PART "$GAR_IMX91S_BOOT_PART"

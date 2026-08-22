@@ -112,6 +112,12 @@ inputs to `flash_singleboot`; they are not invented or copied from the
 Stella2 product. Build output can therefore be produced independently and
 then staged into the UUU tree above.
 
+When UUU is run through WSL2/usbipd, the generated `FB: download` commands use
+`FB[-t 30000]` by default. This is the per-bulk-transfer timeout; the command
+line option `uuu -T` only controls waiting for a USB device at a stage change.
+Override it with `GAR_UUU_TRANSFER_TIMEOUT_MS` in the local UUU environment if
+the host link is slower.
+
 The example target id is `frdm-imx91s`. Select the target backend in `gar setup`
 or the workspace configuration; the Target Pack chooses UUU, SSH, or another
 registered backend through `defaultBackends.target`.
