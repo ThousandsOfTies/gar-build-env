@@ -6,9 +6,10 @@ uuu_version @@UUU_VERSION@@
 # The confirmation command fails before the first NAND write unless the
 # generator was run with GAR_IMX91S_NAND_LAYOUT_CONFIRMED=1.
 
-# Boot the NAND-capable image over USB Serial Downloader. This does not write
-# NAND by itself.
-SDPS[-t 10000]: boot -scanterm -f pub/u-boot/@@NAND_BOOT_IMAGE@@ -scanlimited 0x800000
+# Boot the proven SD/manufacturing U-Boot over USB Serial Downloader. The
+# SPI-NAND image has a NAND-specific SPL transition and is only the payload for
+# fspinand below; using it for SDPS boot disconnects around the SPL boundary.
+SDPS[-t 10000]: boot -scanterm -f pub/u-boot/@@RAM_BOOT_IMAGE@@ -scanlimited 0x800000
 
 # Write the ROM-bootable SPI-NAND image with NXP's fspinand command. The image
 # is first copied to loadaddr in full 1 MiB chunks to avoid the deterministic

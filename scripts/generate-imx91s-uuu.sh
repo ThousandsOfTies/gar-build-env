@@ -93,6 +93,7 @@ fi
 : "${GAR_UUU_TRANSFER_CHUNK_SIZE:=0x100000}"
 : "${GAR_IMX91S_INITRD_ADDR:=0x85000000}"
 : "${GAR_IMX91S_DTB:=imx91-11x11-frdm-imx91s.dtb}"
+: "${GAR_IMX91S_RAM_BOOT_IMAGE:=flash_gar_servo_pet.bin}"
 : "${GAR_IMX91S_NAND_BOOT_IMAGE:=flash_gar_servo_pet_spinand.bin}"
 : "${GAR_IMX91S_NAND_DEVICE:=spi-nand0}"
 : "${GAR_IMX91S_NAND_BOOTLOADER_MTD:=0}"
@@ -113,6 +114,7 @@ for value_name in \
   GAR_UUU_TRANSFER_CHUNK_SIZE \
   GAR_IMX91S_INITRD_ADDR \
   GAR_IMX91S_DTB \
+  GAR_IMX91S_RAM_BOOT_IMAGE \
   GAR_IMX91S_NAND_BOOT_IMAGE \
   GAR_IMX91S_NAND_DEVICE \
   GAR_IMX91S_NAND_BOOTLOADER_MTD \
@@ -179,6 +181,7 @@ echo "Fastboot buffer:  ${GAR_IMX91S_FASTBOOT_BUFFER}"
 echo "Transfer chunk:   ${GAR_UUU_TRANSFER_CHUNK_SIZE}"
 echo "Initrd address:    ${GAR_IMX91S_INITRD_ADDR}"
 echo "DTB:             $GAR_IMX91S_DTB"
+echo "RAM boot image:  $GAR_IMX91S_RAM_BOOT_IMAGE"
 echo "NAND boot image: $GAR_IMX91S_NAND_BOOT_IMAGE"
 echo "NAND device:     $GAR_IMX91S_NAND_DEVICE"
 echo "MTD indices:     bootloader=$GAR_IMX91S_NAND_BOOTLOADER_MTD config=$GAR_IMX91S_NAND_CONFIG_MTD kernel=$GAR_IMX91S_NAND_KERNEL_MTD dtb=$GAR_IMX91S_NAND_DTB_MTD rootfs=$GAR_IMX91S_NAND_ROOTFS_MTD"
@@ -190,6 +193,7 @@ if ((dry_run)); then
 fi
 
 required_files=(
+  "pub/u-boot/${GAR_IMX91S_RAM_BOOT_IMAGE}"
   "pub/u-boot/${GAR_IMX91S_NAND_BOOT_IMAGE}"
   "pub/kernel/Image"
   "pub/kernel/${GAR_IMX91S_DTB}"
@@ -269,6 +273,7 @@ replace_token TRANSFER_TIMEOUT_MS "$GAR_UUU_TRANSFER_TIMEOUT_MS"
 replace_token FASTBOOT_BUFFER "$GAR_IMX91S_FASTBOOT_BUFFER"
 replace_token TRANSFER_CHUNK_SIZE "$GAR_UUU_TRANSFER_CHUNK_SIZE"
 replace_token INITRD_ADDR "$GAR_IMX91S_INITRD_ADDR"
+replace_token RAM_BOOT_IMAGE "$GAR_IMX91S_RAM_BOOT_IMAGE"
 replace_token NAND_BOOT_IMAGE "$GAR_IMX91S_NAND_BOOT_IMAGE"
 replace_token NAND_BOOT_TRANSFER "$nand_boot_transfer"
 replace_token NAND_BOOT_SIZE "$nand_boot_size"

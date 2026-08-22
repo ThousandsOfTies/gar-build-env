@@ -21,6 +21,7 @@ usage() {
 Usage: scripts/stage-imx91s-uuu.sh --input-dir DIR [options]
 
 DIR must contain the built component tree below:
+  pub/u-boot/flash_gar_servo_pet.bin
   pub/u-boot/flash_gar_servo_pet_spinand.bin
   pub/kernel/Image
   pub/kernel/<DTB>
@@ -98,6 +99,7 @@ elif [[ "$config_file" != "${repo_root}/config/imx91s-uuu.env" ]]; then
 fi
 
 : "${GAR_IMX91S_DTB:=imx91-11x11-frdm-imx91s.dtb}"
+: "${GAR_IMX91S_RAM_BOOT_IMAGE:=flash_gar_servo_pet.bin}"
 : "${GAR_IMX91S_NAND_BOOT_IMAGE:=flash_gar_servo_pet_spinand.bin}"
 : "${GAR_IMX91S_NAND_LAYOUT_CONFIRMED:=0}"
 
@@ -112,6 +114,7 @@ if [[ "$GAR_IMX91S_NAND_LAYOUT_CONFIRMED" != "1" && "$allow_unconfirmed" != "1" 
 fi
 
 required_files=(
+  "pub/u-boot/${GAR_IMX91S_RAM_BOOT_IMAGE}"
   "pub/u-boot/${GAR_IMX91S_NAND_BOOT_IMAGE}"
   "pub/kernel/Image"
   "pub/kernel/${GAR_IMX91S_DTB}"
@@ -161,6 +164,7 @@ cp -a "${tmp_dir}/." "$output_dir/"
   cd "$output_dir"
   sha256sum \
     Factory-uuu-gar-servo-pet.lst \
+    "pub/u-boot/${GAR_IMX91S_RAM_BOOT_IMAGE}" \
     "pub/u-boot/${GAR_IMX91S_NAND_BOOT_IMAGE}" \
     pub/kernel/Image \
     "pub/kernel/${GAR_IMX91S_DTB}" \

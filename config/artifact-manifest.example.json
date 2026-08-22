@@ -23,6 +23,10 @@
     "uuu": {
       "files": [
         {
+          "src": "pub/u-boot/flash_gar_servo_pet.bin",
+          "dest": "pub/u-boot/flash_gar_servo_pet.bin"
+        },
+        {
           "src": "pub/u-boot/flash_gar_servo_pet_spinand.bin",
           "dest": "pub/u-boot/flash_gar_servo_pet_spinand.bin"
         },

@@ -72,6 +72,7 @@ The intended IMX91S artifact shape is:
 
 ```text
 Factory-uuu-gar-servo-pet.lst
+pub/u-boot/flash_gar_servo_pet.bin
 pub/u-boot/flash_gar_servo_pet_spinand.bin
 pub/kernel/Image
 pub/kernel/imx91-11x11-frdm-imx91s.dtb
@@ -85,11 +86,12 @@ pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst
 ```
 
 This is deliberately component-based rather than a single `.wic` image. The
-UUU script is board-specific: it installs the ROM-bootable SPI-NAND image with
-U-Boot's `fspinand`, boots the manufacturing initramfs, writes the raw kernel
-and DTB MTD partitions, then creates a writable UBIFS `rootfs` volume from the
-Product SquashFS. The MTD indices and names must match the fixed partitions in
-`imx91-11x11-frdm-imx91s.dts` before a real write is enabled.
+UUU script is board-specific: it RAM-boots the proven SD/manufacturing U-Boot,
+installs the separate SPI-NAND image with `fspinand`, boots the manufacturing
+initramfs, writes the raw kernel and DTB MTD partitions, then creates a
+writable UBIFS `rootfs` volume from the Product SquashFS. The MTD indices and
+names must match the fixed partitions in `imx91-11x11-frdm-imx91s.dts` before
+a real write is enabled.
 
 The repository contains a generator and staging helper for this shape:
 
