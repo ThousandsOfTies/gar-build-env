@@ -9,7 +9,7 @@
 uuu_version @@UUU_VERSION@@
 
 # i.MX91 is an SDPS ROM device with current UUU releases.
-SDPS: boot -f pub/u-boot/flash_gar_servo_pet.bin
+SDPS[-t 10000]: boot -scanterm -f pub/u-boot/flash_gar_servo_pet.bin -scanlimited 0x800000
 
 # Load the manufacturing Linux kernel, DTB, and initramfs through U-Boot.
 # fastboot_bytes is captured immediately after each download because the next

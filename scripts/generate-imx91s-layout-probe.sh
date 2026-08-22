@@ -97,7 +97,7 @@ cat > "$output" <<EOF
 # partition, format, mount, or write the target eMMC.
 uuu_version ${GAR_UUU_VERSION}
 
-SDPS: boot -f pub/u-boot/flash_gar_servo_pet.bin
+SDPS[-t 10000]: boot -scanterm -f pub/u-boot/flash_gar_servo_pet.bin -scanlimited 0x800000
 
 FB: ucmd setenv gar_kernel_addr \${loadaddr}
 FB: ucmd setenv fastboot_buffer \${loadaddr}
