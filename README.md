@@ -72,46 +72,45 @@ The intended IMX91S artifact shape is:
 
 ```text
 Factory-uuu-gar-servo-pet.lst
-pub/u-boot/flash_gar_servo_pet.bin
+pub/u-boot/flash_gar_servo_pet_spinand.bin
 pub/kernel/Image
 pub/kernel/imx91-11x11-frdm-imx91s.dtb
-pub/kernel/extlinux.conf
+pub/uuu-ram/flash_gar_servo_pet_spinand.bin.padded
 pub/uuu-ram/Image.padded
 pub/uuu-ram/imx91-11x11-frdm-imx91s.dtb.padded
 pub/uuu-ram/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst.padded
 pub/rootfs/rootfs.squashfs
 pub/rootfs/usr.local.tar.bz2
 pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst
-pub/layout/gar-servo-pet.sfdisk
 ```
 
 This is deliberately component-based rather than a single `.wic` image. The
-UUU script must be board-specific: it owns the SDP/FBK sequence, partition
-numbers, overlay/storage mounts, and factory updater initialization. The
-kernel/DTB are transferred with the current UUU `FB:` commands to boot the
-manufacturing initramfs; only then does the script use `FBK:` to write the
-components. The layout file is intentionally a Product input and must be
-verified against the physical eMMC before a real write is enabled.
+UUU script is board-specific: it installs the ROM-bootable SPI-NAND image with
+U-Boot's `fspinand`, boots the manufacturing initramfs, writes the raw kernel
+and DTB MTD partitions, then creates a writable UBIFS `rootfs` volume from the
+Product SquashFS. The MTD indices and names must match the fixed partitions in
+`imx91-11x11-frdm-imx91s.dts` before a real write is enabled.
 
 The repository contains a generator and staging helper for this shape:
 
 ```bash
 cp config/imx91s-uuu.env.example config/imx91s-uuu.env
-# Edit the layout and set GAR_IMX91S_LAYOUT_CONFIRMED=1 only after checking it.
+# Run the read-only probe, then confirm the observed MTD names and sizes.
 scripts/generate-imx91s-uuu.sh --config config/imx91s-uuu.env --allow-unconfirmed
 scripts/stage-imx91s-uuu.sh --input-dir /path/to/built-components \
   --config config/imx91s-uuu.env --allow-unconfirmed
 ```
 
-`--allow-unconfirmed` is for producing a dry-run bundle only; the stage helper
-refuses a physical deployment unless the layout is explicitly confirmed.
+`--allow-unconfirmed` produces a review bundle with a U-Boot `test 0 = 1`
+command before the first NAND write. Set
+`GAR_IMX91S_NAND_LAYOUT_CONFIRMED=1` only after the probe agrees with the DTS.
 
 The component build follows the NXP BSP values already checked into the local
 build notes: U-Boot `lf_v2024.04` with
-`imx91_11x11_frdm_imx91s_inline_ecc_defconfig`, Linux `lf-6.6.y` with the
+`imx91_11x11_frdm_imx91s_spinand_defconfig`, Linux `lf-6.6.y` with the
 FRDM-IMX91S DT patches, ATF `lf_v2.8`, and imx-mkimage
 `lf-6.6.3_1.0.0`. The four LPDDR4 training binaries and NXP ELE firmware are
-inputs to `flash_singleboot`; they are not invented or copied from the
+inputs to `flash_singleboot_spinand`; they are not invented or copied from the
 Stella2 product. Build output can therefore be produced independently and
 then staged into the UUU tree above.
 

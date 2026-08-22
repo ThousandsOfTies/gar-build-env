@@ -26,7 +26,7 @@ Options:
   --template FILE        .lst.in template (default: config/Factory-uuu-gar-servo-pet.lst.in)
   --output FILE          generated .lst path
   --bundle-dir DIR       directory containing pub/ component files
-  --allow-unconfirmed    generate while GAR_IMX91S_LAYOUT_CONFIRMED is 0
+  --allow-unconfirmed    generate a review script with NAND writes gated off
   --validate             run `uuu -dry` after generation
   --dry-run              print the resolved values without writing a file
   -h, --help             show this help
@@ -93,13 +93,14 @@ fi
 : "${GAR_UUU_TRANSFER_CHUNK_SIZE:=0x100000}"
 : "${GAR_IMX91S_INITRD_ADDR:=0x85000000}"
 : "${GAR_IMX91S_DTB:=imx91-11x11-frdm-imx91s.dtb}"
-: "${GAR_IMX91S_DISK:=/dev/mmcblk0}"
-: "${GAR_IMX91S_BOOT_PART:=1}"
-: "${GAR_IMX91S_ROOTFS_PART:=2}"
-: "${GAR_IMX91S_OVERLAY_PART:=3}"
-: "${GAR_IMX91S_STORAGE_PART:=4}"
-: "${GAR_IMX91S_LAYOUT_FILE:=pub/layout/gar-servo-pet.sfdisk}"
-: "${GAR_IMX91S_LAYOUT_CONFIRMED:=0}"
+: "${GAR_IMX91S_NAND_BOOT_IMAGE:=flash_gar_servo_pet_spinand.bin}"
+: "${GAR_IMX91S_NAND_DEVICE:=spi-nand0}"
+: "${GAR_IMX91S_NAND_BOOTLOADER_MTD:=0}"
+: "${GAR_IMX91S_NAND_CONFIG_MTD:=1}"
+: "${GAR_IMX91S_NAND_KERNEL_MTD:=2}"
+: "${GAR_IMX91S_NAND_DTB_MTD:=3}"
+: "${GAR_IMX91S_NAND_ROOTFS_MTD:=4}"
+: "${GAR_IMX91S_NAND_LAYOUT_CONFIRMED:=0}"
 
 if [[ -z "$bundle_dir" ]]; then
   bundle_dir="${GAR_IMX91S_UUU_BUNDLE:-$(cd "$(dirname "$output")" && pwd)}"
@@ -112,17 +113,35 @@ for value_name in \
   GAR_UUU_TRANSFER_CHUNK_SIZE \
   GAR_IMX91S_INITRD_ADDR \
   GAR_IMX91S_DTB \
-  GAR_IMX91S_DISK \
-  GAR_IMX91S_BOOT_PART \
-  GAR_IMX91S_ROOTFS_PART \
-  GAR_IMX91S_OVERLAY_PART \
-  GAR_IMX91S_STORAGE_PART \
-  GAR_IMX91S_LAYOUT_FILE; do
+  GAR_IMX91S_NAND_BOOT_IMAGE \
+  GAR_IMX91S_NAND_DEVICE \
+  GAR_IMX91S_NAND_BOOTLOADER_MTD \
+  GAR_IMX91S_NAND_CONFIG_MTD \
+  GAR_IMX91S_NAND_KERNEL_MTD \
+  GAR_IMX91S_NAND_DTB_MTD \
+  GAR_IMX91S_NAND_ROOTFS_MTD; do
   if [[ -z "${!value_name}" ]]; then
     echo "${value_name} must not be empty" >&2
     exit 1
   fi
 done
+
+for mtd_value_name in \
+  GAR_IMX91S_NAND_BOOTLOADER_MTD \
+  GAR_IMX91S_NAND_CONFIG_MTD \
+  GAR_IMX91S_NAND_KERNEL_MTD \
+  GAR_IMX91S_NAND_DTB_MTD \
+  GAR_IMX91S_NAND_ROOTFS_MTD; do
+  if [[ ! "${!mtd_value_name}" =~ ^[0-9]+$ ]]; then
+    echo "${mtd_value_name} must be a non-negative MTD index: ${!mtd_value_name}" >&2
+    exit 1
+  fi
+done
+
+if [[ ! "$GAR_IMX91S_NAND_LAYOUT_CONFIRMED" =~ ^[01]$ ]]; then
+  echo "GAR_IMX91S_NAND_LAYOUT_CONFIRMED must be 0 or 1: $GAR_IMX91S_NAND_LAYOUT_CONFIRMED" >&2
+  exit 1
+fi
 
 if [[ ! "$GAR_UUU_TRANSFER_TIMEOUT_MS" =~ ^[1-9][0-9]*$ ]]; then
   echo "GAR_UUU_TRANSFER_TIMEOUT_MS must be a positive integer: $GAR_UUU_TRANSFER_TIMEOUT_MS" >&2
@@ -145,11 +164,11 @@ if [[ ! -f "$template" ]]; then
   exit 1
 fi
 
-if [[ "$GAR_IMX91S_LAYOUT_CONFIRMED" != "1" && "$allow_unconfirmed" != "1" ]]; then
+if [[ "$GAR_IMX91S_NAND_LAYOUT_CONFIRMED" != "1" && "$allow_unconfirmed" != "1" ]]; then
   cat >&2 <<EOF
-FRDM-IMX91S partition layout is not confirmed.
-Set GAR_IMX91S_LAYOUT_CONFIRMED=1 only after checking the real board, or use
---allow-unconfirmed to generate a dry-run/review bundle.
+FRDM-IMX91S SPI-NAND layout is not confirmed.
+Set GAR_IMX91S_NAND_LAYOUT_CONFIRMED=1 only after checking the real board, or
+use --allow-unconfirmed to generate a review script whose first write gate fails.
 EOF
   exit 1
 fi
@@ -160,9 +179,10 @@ echo "Fastboot buffer:  ${GAR_IMX91S_FASTBOOT_BUFFER}"
 echo "Transfer chunk:   ${GAR_UUU_TRANSFER_CHUNK_SIZE}"
 echo "Initrd address:    ${GAR_IMX91S_INITRD_ADDR}"
 echo "DTB:             $GAR_IMX91S_DTB"
-echo "Linux disk:      $GAR_IMX91S_DISK"
-echo "Partitions:      boot=$GAR_IMX91S_BOOT_PART rootfs=$GAR_IMX91S_ROOTFS_PART overlay=$GAR_IMX91S_OVERLAY_PART storage=$GAR_IMX91S_STORAGE_PART"
-echo "Layout confirmed: $GAR_IMX91S_LAYOUT_CONFIRMED"
+echo "NAND boot image: $GAR_IMX91S_NAND_BOOT_IMAGE"
+echo "NAND device:     $GAR_IMX91S_NAND_DEVICE"
+echo "MTD indices:     bootloader=$GAR_IMX91S_NAND_BOOTLOADER_MTD config=$GAR_IMX91S_NAND_CONFIG_MTD kernel=$GAR_IMX91S_NAND_KERNEL_MTD dtb=$GAR_IMX91S_NAND_DTB_MTD rootfs=$GAR_IMX91S_NAND_ROOTFS_MTD"
+echo "NAND confirmed:  $GAR_IMX91S_NAND_LAYOUT_CONFIRMED"
 
 if ((dry_run)); then
   echo "would generate: $output"
@@ -170,8 +190,11 @@ if ((dry_run)); then
 fi
 
 required_files=(
+  "pub/u-boot/${GAR_IMX91S_NAND_BOOT_IMAGE}"
   "pub/kernel/Image"
   "pub/kernel/${GAR_IMX91S_DTB}"
+  "pub/rootfs/rootfs.squashfs"
+  "pub/rootfs/usr.local.tar.bz2"
   "pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst"
 )
 for relative in "${required_files[@]}"; do
@@ -188,10 +211,25 @@ file_size_hex() {
 kernel_size="$(file_size_hex "${bundle_dir}/pub/kernel/Image")"
 dtb_size="$(file_size_hex "${bundle_dir}/pub/kernel/${GAR_IMX91S_DTB}")"
 initrd_size="$(file_size_hex "${bundle_dir}/pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst")"
+nand_boot_size="$(file_size_hex "${bundle_dir}/pub/u-boot/${GAR_IMX91S_NAND_BOOT_IMAGE}")"
+
+if ((kernel_size > 0x2400000)); then
+  echo "kernel exceeds the 36 MiB NAND partition: $kernel_size" >&2
+  exit 1
+fi
+if ((dtb_size > 0x20000)); then
+  echo "DTB exceeds the 128 KiB NAND partition: $dtb_size" >&2
+  exit 1
+fi
+if ((nand_boot_size > 0x800000)); then
+  echo "NAND boot image exceeds the 8 MiB bootloader partition: $nand_boot_size" >&2
+  exit 1
+fi
 
 kernel_transfer="pub/uuu-ram/Image.padded"
 dtb_transfer="pub/uuu-ram/${GAR_IMX91S_DTB}.padded"
 initrd_transfer="pub/uuu-ram/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst.padded"
+nand_boot_transfer="pub/uuu-ram/${GAR_IMX91S_NAND_BOOT_IMAGE}.padded"
 
 prepare_padded_payload() {
   local source="$1"
@@ -211,6 +249,9 @@ prepare_padded_payload "${bundle_dir}/pub/kernel/${GAR_IMX91S_DTB}" "$dtb_transf
 prepare_padded_payload \
   "${bundle_dir}/pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst" \
   "$initrd_transfer"
+prepare_padded_payload \
+  "${bundle_dir}/pub/u-boot/${GAR_IMX91S_NAND_BOOT_IMAGE}" \
+  "$nand_boot_transfer"
 
 mkdir -p "$(dirname "$output")"
 cp "$template" "$output"
@@ -228,6 +269,11 @@ replace_token TRANSFER_TIMEOUT_MS "$GAR_UUU_TRANSFER_TIMEOUT_MS"
 replace_token FASTBOOT_BUFFER "$GAR_IMX91S_FASTBOOT_BUFFER"
 replace_token TRANSFER_CHUNK_SIZE "$GAR_UUU_TRANSFER_CHUNK_SIZE"
 replace_token INITRD_ADDR "$GAR_IMX91S_INITRD_ADDR"
+replace_token NAND_BOOT_IMAGE "$GAR_IMX91S_NAND_BOOT_IMAGE"
+replace_token NAND_BOOT_TRANSFER "$nand_boot_transfer"
+replace_token NAND_BOOT_SIZE "$nand_boot_size"
+replace_token NAND_DEVICE "$GAR_IMX91S_NAND_DEVICE"
+replace_token NAND_LAYOUT_CONFIRMED "$GAR_IMX91S_NAND_LAYOUT_CONFIRMED"
 replace_token KERNEL_TRANSFER "$kernel_transfer"
 replace_token DTB_TRANSFER "$dtb_transfer"
 replace_token INITRD_TRANSFER "$initrd_transfer"
@@ -235,11 +281,11 @@ replace_token KERNEL_SIZE "$kernel_size"
 replace_token DTB_SIZE "$dtb_size"
 replace_token INITRD_SIZE "$initrd_size"
 replace_token DTB "$GAR_IMX91S_DTB"
-replace_token DISK "$GAR_IMX91S_DISK"
-replace_token BOOT_PART "$GAR_IMX91S_BOOT_PART"
-replace_token ROOTFS_PART "$GAR_IMX91S_ROOTFS_PART"
-replace_token OVERLAY_PART "$GAR_IMX91S_OVERLAY_PART"
-replace_token STORAGE_PART "$GAR_IMX91S_STORAGE_PART"
+replace_token BOOTLOADER_MTD "$GAR_IMX91S_NAND_BOOTLOADER_MTD"
+replace_token CONFIG_MTD "$GAR_IMX91S_NAND_CONFIG_MTD"
+replace_token KERNEL_MTD "$GAR_IMX91S_NAND_KERNEL_MTD"
+replace_token DTB_MTD "$GAR_IMX91S_NAND_DTB_MTD"
+replace_token ROOTFS_MTD "$GAR_IMX91S_NAND_ROOTFS_MTD"
 
 if grep -Eq '@@[A-Z0-9_]+@@' "$output"; then
   echo "unresolved placeholders remain in $output" >&2

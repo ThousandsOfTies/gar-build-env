@@ -23,8 +23,8 @@
     "uuu": {
       "files": [
         {
-          "src": "pub/u-boot/flash_gar_servo_pet.bin",
-          "dest": "pub/u-boot/flash_gar_servo_pet.bin"
+          "src": "pub/u-boot/flash_gar_servo_pet_spinand.bin",
+          "dest": "pub/u-boot/flash_gar_servo_pet_spinand.bin"
         },
         {
           "src": "pub/kernel/Image",
@@ -35,8 +35,8 @@
           "dest": "pub/kernel/imx91-11x11-frdm-imx91s.dtb"
         },
         {
-          "src": "pub/kernel/extlinux.conf",
-          "dest": "pub/kernel/extlinux.conf"
+          "src": "pub/uuu-ram/flash_gar_servo_pet_spinand.bin.padded",
+          "dest": "pub/uuu-ram/flash_gar_servo_pet_spinand.bin.padded"
         },
         {
           "src": "pub/uuu-ram/Image.padded",
@@ -61,10 +61,6 @@
         {
           "src": "pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst",
           "dest": "pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst"
-        },
-        {
-          "src": "pub/layout/gar-servo-pet.sfdisk",
-          "dest": "pub/layout/gar-servo-pet.sfdisk"
         }
       ]
     }

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Generate a read-only UUU script for inspecting the actual FRDM-IMX91S eMMC.
-# This boots the manufacturing initramfs into RAM and never runs sfdisk/mkfs/dd.
+# Generate a read-only UUU script for inspecting FRDM-IMX91S SPI-NAND.
+# This boots the manufacturing initramfs into RAM and never erases or writes MTD.
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -20,8 +20,8 @@ usage() {
 Usage: scripts/generate-imx91s-layout-probe.sh [options]
 
 Generate a read-only UUU script which boots the manufacturing initramfs and
-prints the eMMC device/partition information. It never runs sfdisk, mkfs, dd,
-mount, or any other persistent-write command.
+prints the SPI-NAND MTD/UBI information. It never erases, formats, mounts, or
+writes persistent storage.
 
 Options:
   --config FILE       UUU/layout environment file
@@ -145,9 +145,9 @@ mkdir -p "$(dirname "$output")"
 cat > "$output" <<EOF
 uuu_version ${GAR_UUU_VERSION}
 
-# Read-only FRDM-IMX91S eMMC layout probe.
+# Read-only FRDM-IMX91S SPI-NAND layout probe.
 # This script boots Linux into RAM and only prints information. It does not
-# partition, format, mount, or write the target eMMC.
+# erase, format, mount, or write the target SPI-NAND.
 
 SDPS[-t 10000]: boot -scanterm -f pub/u-boot/flash_gar_servo_pet.bin -scanlimited 0x800000
 
@@ -172,21 +172,32 @@ FB: acmd run gar_bootcmd
 
 FBK: ucmd echo GAR_IMX91S_LAYOUT_PROBE_BEGIN
 FBK: ucmd udevadm settle || true
+FBK: ucmd cat /proc/mtd
+FBK: ucmd ls -l /dev/mtd* || true
+FBK: ucmd cat /sys/class/mtd/mtd0/name
+FBK: ucmd cat /sys/class/mtd/mtd0/size
+FBK: ucmd cat /sys/class/mtd/mtd0/erasesize
+FBK: ucmd cat /sys/class/mtd/mtd0/writesize
+FBK: ucmd cat /sys/class/mtd/mtd1/name
+FBK: ucmd cat /sys/class/mtd/mtd1/size
+FBK: ucmd cat /sys/class/mtd/mtd2/name
+FBK: ucmd cat /sys/class/mtd/mtd2/size
+FBK: ucmd cat /sys/class/mtd/mtd3/name
+FBK: ucmd cat /sys/class/mtd/mtd3/size
+FBK: ucmd cat /sys/class/mtd/mtd4/name
+FBK: ucmd cat /sys/class/mtd/mtd4/size
+FBK: ucmd ubinfo -a || true
+# Keep block-device output as context: mmcblk1 is the removable microSD on the
+# observed board, not the onboard target used by the NAND factory flow.
 FBK: ucmd cat /proc/partitions
-FBK: ucmd ls -l /dev/mmcblk0* || true
 FBK: ucmd ls -l /dev/mmcblk1* || true
-FBK: ucmd cat /sys/block/mmcblk0/size || true
 FBK: ucmd cat /sys/block/mmcblk1/size || true
-FBK: ucmd blockdev --getsize64 /dev/mmcblk0 || true
 FBK: ucmd blockdev --getsize64 /dev/mmcblk1 || true
-FBK: ucmd sfdisk --dump /dev/mmcblk0 || true
 FBK: ucmd sfdisk --dump /dev/mmcblk1 || true
-FBK: ucmd cat /sys/block/mmcblk0/device/name || true
 FBK: ucmd cat /sys/block/mmcblk1/device/name || true
-FBK: ucmd cat /sys/block/mmcblk0/device/type || true
 FBK: ucmd cat /sys/block/mmcblk1/device/type || true
 FBK: ucmd echo GAR_IMX91S_LAYOUT_PROBE_END
-FBK: acmd reboot
+FBK: acmd reboot -f
 EOF
 
 if [[ "$(sed -n '1p' "$output")" != "uuu_version "* ]]; then

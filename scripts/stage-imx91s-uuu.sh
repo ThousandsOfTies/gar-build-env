@@ -21,20 +21,18 @@ usage() {
 Usage: scripts/stage-imx91s-uuu.sh --input-dir DIR [options]
 
 DIR must contain the built component tree below:
-  pub/u-boot/flash_gar_servo_pet.bin
+  pub/u-boot/flash_gar_servo_pet_spinand.bin
   pub/kernel/Image
   pub/kernel/<DTB>
-  pub/kernel/extlinux.conf
   pub/rootfs/rootfs.squashfs
   pub/rootfs/usr.local.tar.bz2
   pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst
-  pub/layout/gar-servo-pet.sfdisk
 
 Options:
   --input-dir DIR        component input tree (or GAR_UUU_INPUT_DIR)
   --output-dir DIR       output bundle (default: artifacts/from-codespace)
   --config FILE          UUU/layout environment file
-  --allow-unconfirmed    stage a review/dry-run bundle while layout is 0
+  --allow-unconfirmed    stage a review bundle whose NAND write gate is off
   --validate             run `uuu -dry` against the staged bundle
   --force                replace an existing output directory
   -h, --help             show this help
@@ -100,30 +98,26 @@ elif [[ "$config_file" != "${repo_root}/config/imx91s-uuu.env" ]]; then
 fi
 
 : "${GAR_IMX91S_DTB:=imx91-11x11-frdm-imx91s.dtb}"
-: "${GAR_IMX91S_LAYOUT_FILE:=pub/layout/gar-servo-pet.sfdisk}"
-: "${GAR_IMX91S_LAYOUT_CONFIRMED:=0}"
+: "${GAR_IMX91S_NAND_BOOT_IMAGE:=flash_gar_servo_pet_spinand.bin}"
+: "${GAR_IMX91S_NAND_LAYOUT_CONFIRMED:=0}"
 
-if [[ "$GAR_IMX91S_LAYOUT_CONFIRMED" != "1" && "$allow_unconfirmed" != "1" ]]; then
-  echo "refusing to stage an unconfirmed FRDM-IMX91S layout; use --allow-unconfirmed for review only" >&2
+if [[ ! "$GAR_IMX91S_NAND_LAYOUT_CONFIRMED" =~ ^[01]$ ]]; then
+  echo "GAR_IMX91S_NAND_LAYOUT_CONFIRMED must be 0 or 1: $GAR_IMX91S_NAND_LAYOUT_CONFIRMED" >&2
   exit 1
 fi
 
-case "$GAR_IMX91S_LAYOUT_FILE" in
-  /*|*../*)
-    echo "GAR_IMX91S_LAYOUT_FILE must be a relative path inside the bundle: $GAR_IMX91S_LAYOUT_FILE" >&2
-    exit 1
-    ;;
-esac
+if [[ "$GAR_IMX91S_NAND_LAYOUT_CONFIRMED" != "1" && "$allow_unconfirmed" != "1" ]]; then
+  echo "refusing to stage an unconfirmed FRDM-IMX91S NAND layout; use --allow-unconfirmed for review only" >&2
+  exit 1
+fi
 
 required_files=(
-  "pub/u-boot/flash_gar_servo_pet.bin"
+  "pub/u-boot/${GAR_IMX91S_NAND_BOOT_IMAGE}"
   "pub/kernel/Image"
   "pub/kernel/${GAR_IMX91S_DTB}"
-  "pub/kernel/extlinux.conf"
   "pub/rootfs/rootfs.squashfs"
   "pub/rootfs/usr.local.tar.bz2"
   "pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst"
-  "$GAR_IMX91S_LAYOUT_FILE"
 )
 
 for relative in "${required_files[@]}"; do
@@ -151,6 +145,7 @@ done
 generate_args=(
   --config "$config_file"
   --output "${tmp_dir}/Factory-uuu-gar-servo-pet.lst"
+  --bundle-dir "$tmp_dir"
 )
 if ((allow_unconfirmed)); then
   generate_args+=(--allow-unconfirmed)
@@ -166,23 +161,22 @@ cp -a "${tmp_dir}/." "$output_dir/"
   cd "$output_dir"
   sha256sum \
     Factory-uuu-gar-servo-pet.lst \
-    pub/u-boot/flash_gar_servo_pet.bin \
+    "pub/u-boot/${GAR_IMX91S_NAND_BOOT_IMAGE}" \
     pub/kernel/Image \
     "pub/kernel/${GAR_IMX91S_DTB}" \
-    pub/kernel/extlinux.conf \
+    "pub/uuu-ram/${GAR_IMX91S_NAND_BOOT_IMAGE}.padded" \
     pub/uuu-ram/Image.padded \
     "pub/uuu-ram/${GAR_IMX91S_DTB}.padded" \
     pub/uuu-ram/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst.padded \
     pub/rootfs/rootfs.squashfs \
     pub/rootfs/usr.local.tar.bz2 \
-    pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst \
-    "$GAR_IMX91S_LAYOUT_FILE" > checksums.sha256
+    pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst > checksums.sha256
 )
 
 cat > "${output_dir}/bundle-info.txt" <<EOF
 GarServoPet FRDM-IMX91S component UUU bundle
 Generated: $(date -u +%Y-%m-%dT%H:%M:%SZ)
-Layout confirmed: ${GAR_IMX91S_LAYOUT_CONFIRMED}
+SPI-NAND layout confirmed: ${GAR_IMX91S_NAND_LAYOUT_CONFIRMED}
 This bundle contains UUU components only; merge it with the Product app
 artifact before invoking \`gar target deploy\`.
 EOF
