@@ -126,6 +126,16 @@ For USB-C boot verification, set the workspace `target.serial` to the first
 CH342/CH343 debug-UART device. With the observed WSL2 adapter this is usually
 `/dev/ttyACM0` (the second channel is `/dev/ttyACM1`).
 
+For the UUU USB1 device under WSL2, bind bus `4-3` once from an elevated
+Windows PowerShell and use auto-attach. The board changes from ROM
+`1fc9:0159` to U-Boot fastboot `1fc9:0152` after the SDPS stage; without
+auto-attach, UUU cannot see that second enumeration.
+
+```powershell
+usbipd bind --busid 4-3
+usbipd attach --wsl --busid 4-3 --auto-attach
+```
+
 ## Current status
 
 The repositories and ownership boundaries are initialized. Servo roles,
