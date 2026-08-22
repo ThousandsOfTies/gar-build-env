@@ -80,9 +80,14 @@ FBK: ucmd mkdir -p /mnt/gar-source /mnt/gar-rootfs
 FBK: ucmd mount -t squashfs -o loop,ro /tmp/gar-rootfs.squashfs /mnt/gar-source
 FBK: ucmd mount -t ubifs ubi0:rootfs /mnt/gar-rootfs
 FBK: ucmd cp -a /mnt/gar-source/. /mnt/gar-rootfs/
+# cp -a also copies the SquashFS root directory ownership. Yocto artifacts can
+# carry the host build UID there; systemd-tmpfiles then rejects every path below
+# / as an unsafe ownership transition. Normalize the deployed filesystem root.
+FBK: ucmd chown 0:0 /mnt/gar-rootfs
+FBK: ucmd chmod 0755 /mnt/gar-rootfs
 FBK: ucmd tar -xjf /tmp/gar-usr.local.tar.bz2 -C /mnt/gar-rootfs
 FBK: ucmd sync
 FBK: ucmd umount /mnt/gar-rootfs
 FBK: ucmd umount /mnt/gar-source
 FBK: ucmd ubidetach /dev/ubi_ctrl -m @@ROOTFS_MTD@@
-FBK: acmd reboot -f
+FBK: ucmd echo GAR_IMX91S_NAND_FLASH_COMPLETE
