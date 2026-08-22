@@ -37,7 +37,10 @@ FB: ucmd setenv gar_initrd_addr ${initrd_addr}
 FB: ucmd setenv fastboot_buffer @@FASTBOOT_BUFFER@@
 FB[-t @@TRANSFER_TIMEOUT_MS@@]: write -f @@INITRD_TRANSFER@@ -format "setexpr gar_copy_dst ${initrd_addr} + @off; cp.b ${fastboot_buffer} ${gar_copy_dst} @size" -blksz 1 -each @@TRANSFER_CHUNK_SIZE@@
 FB: ucmd setenv gar_initrd_size @@INITRD_SIZE@@
-FB: acmd booti ${gar_kernel_addr} ${gar_initrd_addr}:${gar_initrd_size} ${gar_dtb_addr}
+# Fastboot ACmd has a short command-length limit. Store the full command via
+# UCmd, then asynchronously execute only the short environment-variable name.
+FB: ucmd setenv gar_bootcmd booti ${gar_kernel_addr} ${gar_initrd_addr}:${gar_initrd_size} ${gar_dtb_addr}
+FB: acmd run gar_bootcmd
 
 # The initramfs must provide the NXP imx-uuc/linuxrc endpoint.  All following
 # commands run in that Linux environment, not in U-Boot.

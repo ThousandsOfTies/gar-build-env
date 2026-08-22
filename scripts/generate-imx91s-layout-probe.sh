@@ -164,7 +164,8 @@ FB: ucmd setenv gar_initrd_addr \${initrd_addr}
 FB: ucmd setenv fastboot_buffer ${GAR_IMX91S_FASTBOOT_BUFFER}
 FB[-t ${GAR_UUU_TRANSFER_TIMEOUT_MS}]: write -f ${initrd_transfer} -format "setexpr gar_copy_dst \${initrd_addr} + @off; cp.b \${fastboot_buffer} \${gar_copy_dst} @size" -blksz 1 -each ${GAR_UUU_TRANSFER_CHUNK_SIZE}
 FB: ucmd setenv gar_initrd_size ${initrd_size}
-FB: acmd booti \${gar_kernel_addr} \${gar_initrd_addr}:\${gar_initrd_size} \${gar_dtb_addr}
+FB: ucmd setenv gar_bootcmd booti \${gar_kernel_addr} \${gar_initrd_addr}:\${gar_initrd_size} \${gar_dtb_addr}
+FB: acmd run gar_bootcmd
 
 FBK: ucmd echo GAR_IMX91S_LAYOUT_PROBE_BEGIN
 FBK: ucmd udevadm settle || true
