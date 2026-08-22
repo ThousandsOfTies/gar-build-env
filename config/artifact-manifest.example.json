@@ -39,6 +39,18 @@
           "dest": "pub/kernel/extlinux.conf"
         },
         {
+          "src": "pub/uuu-ram/Image.padded",
+          "dest": "pub/uuu-ram/Image.padded"
+        },
+        {
+          "src": "pub/uuu-ram/imx91-11x11-frdm-imx91s.dtb.padded",
+          "dest": "pub/uuu-ram/imx91-11x11-frdm-imx91s.dtb.padded"
+        },
+        {
+          "src": "pub/uuu-ram/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst.padded",
+          "dest": "pub/uuu-ram/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst.padded"
+        },
+        {
           "src": "pub/rootfs/rootfs.squashfs",
           "dest": "pub/rootfs/rootfs.squashfs"
         },

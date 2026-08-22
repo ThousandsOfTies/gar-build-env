@@ -76,6 +76,9 @@ pub/u-boot/flash_gar_servo_pet.bin
 pub/kernel/Image
 pub/kernel/imx91-11x11-frdm-imx91s.dtb
 pub/kernel/extlinux.conf
+pub/uuu-ram/Image.padded
+pub/uuu-ram/imx91-11x11-frdm-imx91s.dtb.padded
+pub/uuu-ram/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst.padded
 pub/rootfs/rootfs.squashfs
 pub/rootfs/usr.local.tar.bz2
 pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst
@@ -115,8 +118,12 @@ then staged into the UUU tree above.
 When UUU is run through WSL2/usbipd, the generated component scripts use
 chunked `FB: write` transfers with `FB[-t 30000]` by default. This avoids the
 short fixed bulk timeout used by the older `FB: download` implementation and
-copies each chunk into the correct RAM offset before booting Linux. The command
-line option `uuu -T` only controls waiting for a USB device at a stage change.
+copies each chunk into the correct RAM offset before booting Linux. The
+generator also creates transfer-only copies under `pub/uuu-ram`, zero-padded
+to the chunk boundary. This prevents the deterministic Fastboot timeout seen
+on the final short chunk while retaining the original kernel, DTB, and initrd
+sizes for `booti`. The command-line option `uuu -T` only controls waiting for
+a USB device at a stage change.
 Override the transfer timeout or chunk size with
 `GAR_UUU_TRANSFER_TIMEOUT_MS`/`GAR_UUU_TRANSFER_CHUNK_SIZE` in the local UUU
 environment if the host link is slower.

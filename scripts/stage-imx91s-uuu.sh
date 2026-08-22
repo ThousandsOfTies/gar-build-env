@@ -170,6 +170,9 @@ cp -a "${tmp_dir}/." "$output_dir/"
     pub/kernel/Image \
     "pub/kernel/${GAR_IMX91S_DTB}" \
     pub/kernel/extlinux.conf \
+    pub/uuu-ram/Image.padded \
+    "pub/uuu-ram/${GAR_IMX91S_DTB}.padded" \
+    pub/uuu-ram/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst.padded \
     pub/rootfs/rootfs.squashfs \
     pub/rootfs/usr.local.tar.bz2 \
     pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst \

@@ -89,6 +89,11 @@ for hex_value_name in GAR_IMX91S_FASTBOOT_BUFFER GAR_UUU_TRANSFER_CHUNK_SIZE; do
     exit 1
   fi
 done
+transfer_chunk_size=$((GAR_UUU_TRANSFER_CHUNK_SIZE))
+if ((transfer_chunk_size == 0 || transfer_chunk_size > 0x100000)); then
+  echo "GAR_UUU_TRANSFER_CHUNK_SIZE must be between 0x1 and 0x100000: $GAR_UUU_TRANSFER_CHUNK_SIZE" >&2
+  exit 1
+fi
 
 required_files=(
   "pub/u-boot/flash_gar_servo_pet.bin"
@@ -112,6 +117,29 @@ kernel_size="$(file_size_hex "${bundle_dir}/pub/kernel/Image")"
 dtb_size="$(file_size_hex "${bundle_dir}/pub/kernel/${GAR_IMX91S_DTB}")"
 initrd_size="$(file_size_hex "${bundle_dir}/pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst")"
 
+kernel_transfer="pub/uuu-ram/Image.padded"
+dtb_transfer="pub/uuu-ram/${GAR_IMX91S_DTB}.padded"
+initrd_transfer="pub/uuu-ram/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst.padded"
+
+prepare_padded_payload() {
+  local source="$1"
+  local relative_destination="$2"
+  local size padded_size destination
+  size="$(stat -c '%s' "$source")"
+  padded_size=$(((size + transfer_chunk_size - 1) / transfer_chunk_size * transfer_chunk_size))
+  destination="${bundle_dir}/${relative_destination}"
+  install -D -m 0644 "$source" "$destination"
+  truncate -s "$padded_size" "$destination"
+  printf 'prepared UUU RAM payload: %s (original=0x%X padded=0x%X)\n' \
+    "$relative_destination" "$size" "$padded_size"
+}
+
+prepare_padded_payload "${bundle_dir}/pub/kernel/Image" "$kernel_transfer"
+prepare_padded_payload "${bundle_dir}/pub/kernel/${GAR_IMX91S_DTB}" "$dtb_transfer"
+prepare_padded_payload \
+  "${bundle_dir}/pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst" \
+  "$initrd_transfer"
+
 mkdir -p "$(dirname "$output")"
 cat > "$output" <<EOF
 uuu_version ${GAR_UUU_VERSION}
@@ -124,17 +152,17 @@ SDPS[-t 10000]: boot -scanterm -f pub/u-boot/flash_gar_servo_pet.bin -scanlimite
 
 FB: ucmd setenv gar_kernel_addr \${loadaddr}
 FB: ucmd setenv fastboot_buffer ${GAR_IMX91S_FASTBOOT_BUFFER}
-FB[-t ${GAR_UUU_TRANSFER_TIMEOUT_MS}]: write -f pub/kernel/Image -format "setexpr gar_copy_dst \${loadaddr} + @off; cp.b \${fastboot_buffer} \${gar_copy_dst} @size" -blksz 1 -each ${GAR_UUU_TRANSFER_CHUNK_SIZE}
+FB[-t ${GAR_UUU_TRANSFER_TIMEOUT_MS}]: write -f ${kernel_transfer} -format "setexpr gar_copy_dst \${loadaddr} + @off; cp.b \${fastboot_buffer} \${gar_copy_dst} @size" -blksz 1 -each ${GAR_UUU_TRANSFER_CHUNK_SIZE}
 FB: ucmd setenv gar_kernel_size ${kernel_size}
 
 FB: ucmd setenv gar_dtb_addr \${fdt_addr_r}
 FB: ucmd setenv fastboot_buffer ${GAR_IMX91S_FASTBOOT_BUFFER}
-FB[-t ${GAR_UUU_TRANSFER_TIMEOUT_MS}]: write -f pub/kernel/${GAR_IMX91S_DTB} -format "setexpr gar_copy_dst \${fdt_addr_r} + @off; cp.b \${fastboot_buffer} \${gar_copy_dst} @size" -blksz 1 -each ${GAR_UUU_TRANSFER_CHUNK_SIZE}
+FB[-t ${GAR_UUU_TRANSFER_TIMEOUT_MS}]: write -f ${dtb_transfer} -format "setexpr gar_copy_dst \${fdt_addr_r} + @off; cp.b \${fastboot_buffer} \${gar_copy_dst} @size" -blksz 1 -each ${GAR_UUU_TRANSFER_CHUNK_SIZE}
 FB: ucmd setenv gar_dtb_size ${dtb_size}
 
 FB: ucmd setenv gar_initrd_addr \${initrd_addr}
 FB: ucmd setenv fastboot_buffer ${GAR_IMX91S_FASTBOOT_BUFFER}
-FB[-t ${GAR_UUU_TRANSFER_TIMEOUT_MS}]: write -f pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst -format "setexpr gar_copy_dst \${initrd_addr} + @off; cp.b \${fastboot_buffer} \${gar_copy_dst} @size" -blksz 1 -each ${GAR_UUU_TRANSFER_CHUNK_SIZE}
+FB[-t ${GAR_UUU_TRANSFER_TIMEOUT_MS}]: write -f ${initrd_transfer} -format "setexpr gar_copy_dst \${initrd_addr} + @off; cp.b \${fastboot_buffer} \${gar_copy_dst} @size" -blksz 1 -each ${GAR_UUU_TRANSFER_CHUNK_SIZE}
 FB: ucmd setenv gar_initrd_size ${initrd_size}
 FB: acmd booti \${gar_kernel_addr} \${gar_initrd_addr}:\${gar_initrd_size} \${gar_dtb_addr}
 

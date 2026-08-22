@@ -132,6 +132,11 @@ for hex_value_name in GAR_IMX91S_FASTBOOT_BUFFER GAR_UUU_TRANSFER_CHUNK_SIZE; do
     exit 1
   fi
 done
+transfer_chunk_size=$((GAR_UUU_TRANSFER_CHUNK_SIZE))
+if ((transfer_chunk_size == 0 || transfer_chunk_size > 0x100000)); then
+  echo "GAR_UUU_TRANSFER_CHUNK_SIZE must be between 0x1 and 0x100000: $GAR_UUU_TRANSFER_CHUNK_SIZE" >&2
+  exit 1
+fi
 
 if [[ ! -f "$template" ]]; then
   echo "missing UUU template: $template" >&2
@@ -181,6 +186,29 @@ kernel_size="$(file_size_hex "${bundle_dir}/pub/kernel/Image")"
 dtb_size="$(file_size_hex "${bundle_dir}/pub/kernel/${GAR_IMX91S_DTB}")"
 initrd_size="$(file_size_hex "${bundle_dir}/pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst")"
 
+kernel_transfer="pub/uuu-ram/Image.padded"
+dtb_transfer="pub/uuu-ram/${GAR_IMX91S_DTB}.padded"
+initrd_transfer="pub/uuu-ram/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst.padded"
+
+prepare_padded_payload() {
+  local source="$1"
+  local relative_destination="$2"
+  local size padded_size destination
+  size="$(stat -c '%s' "$source")"
+  padded_size=$(((size + transfer_chunk_size - 1) / transfer_chunk_size * transfer_chunk_size))
+  destination="${bundle_dir}/${relative_destination}"
+  install -D -m 0644 "$source" "$destination"
+  truncate -s "$padded_size" "$destination"
+  printf 'prepared UUU RAM payload: %s (original=0x%X padded=0x%X)\n' \
+    "$relative_destination" "$size" "$padded_size"
+}
+
+prepare_padded_payload "${bundle_dir}/pub/kernel/Image" "$kernel_transfer"
+prepare_padded_payload "${bundle_dir}/pub/kernel/${GAR_IMX91S_DTB}" "$dtb_transfer"
+prepare_padded_payload \
+  "${bundle_dir}/pub/mfgtools/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst" \
+  "$initrd_transfer"
+
 mkdir -p "$(dirname "$output")"
 cp "$template" "$output"
 
@@ -196,6 +224,9 @@ replace_token UUU_VERSION "$GAR_UUU_VERSION"
 replace_token TRANSFER_TIMEOUT_MS "$GAR_UUU_TRANSFER_TIMEOUT_MS"
 replace_token FASTBOOT_BUFFER "$GAR_IMX91S_FASTBOOT_BUFFER"
 replace_token TRANSFER_CHUNK_SIZE "$GAR_UUU_TRANSFER_CHUNK_SIZE"
+replace_token KERNEL_TRANSFER "$kernel_transfer"
+replace_token DTB_TRANSFER "$dtb_transfer"
+replace_token INITRD_TRANSFER "$initrd_transfer"
 replace_token KERNEL_SIZE "$kernel_size"
 replace_token DTB_SIZE "$dtb_size"
 replace_token INITRD_SIZE "$initrd_size"
