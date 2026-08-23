@@ -13,13 +13,17 @@ the physical deployment target, not a Product Web Component: in EC2 or
 VirtualBox simulation its role is taken by the VM and application.
 
 `connections.csv` maps PCA9685 channels 0 through 3 to the four servo signal
-inputs. `i2c.csv` selects the reusable PCA9685 register simulation at address
-`0x40` for the VM-facing `/dev/i2c-1` interface.
+inputs. `i2c.csv` selects address `0x40` on `/dev/i2c-3`. The Product DT
+overlay enables SoC LPI2C4 on expansion-header pin 3 (SDA) and pin 5 (SCL);
+the Linux `i2c3` alias makes that controller `/dev/i2c-3`.
+
+`devicetree/imx91s-i2c4-pca9685.dtso` owns this Product pinmux choice. It
+cannot be combined with an RGB display configuration that claims GPIO_IO02
+and GPIO_IO03 for display VSYNC/HSYNC.
 
 ## Pending decisions
 
 - Mechanical role and name of each servo
-- PCA9685 I2C bus and address on the FRDM-IMX91S
 - Servo channel assignment and direction
 - Neutral position, safe pulse range, and mechanical travel for each servo
 - Dedicated 5 V servo supply and current capacity

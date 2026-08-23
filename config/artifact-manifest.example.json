@@ -35,8 +35,8 @@
           "dest": "pub/kernel/Image"
         },
         {
-          "src": "pub/kernel/imx91-11x11-frdm-imx91s.dtb",
-          "dest": "pub/kernel/imx91-11x11-frdm-imx91s.dtb"
+          "src": "pub/kernel/imx91-11x11-frdm-imx91s-gar-servo-pet.dtb",
+          "dest": "pub/kernel/imx91-11x11-frdm-imx91s-gar-servo-pet.dtb"
         },
         {
           "src": "pub/uuu-ram/flash_gar_servo_pet_spinand.bin.padded",
@@ -47,8 +47,8 @@
           "dest": "pub/uuu-ram/Image.padded"
         },
         {
-          "src": "pub/uuu-ram/imx91-11x11-frdm-imx91s.dtb.padded",
-          "dest": "pub/uuu-ram/imx91-11x11-frdm-imx91s.dtb.padded"
+          "src": "pub/uuu-ram/imx91-11x11-frdm-imx91s-gar-servo-pet.dtb.padded",
+          "dest": "pub/uuu-ram/imx91-11x11-frdm-imx91s-gar-servo-pet.dtb.padded"
         },
         {
           "src": "pub/uuu-ram/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst.padded",

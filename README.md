@@ -75,10 +75,10 @@ Factory-uuu-gar-servo-pet.lst
 pub/u-boot/flash_gar_servo_pet.bin
 pub/u-boot/flash_gar_servo_pet_spinand.bin
 pub/kernel/Image
-pub/kernel/imx91-11x11-frdm-imx91s.dtb
+pub/kernel/imx91-11x11-frdm-imx91s-gar-servo-pet.dtb
 pub/uuu-ram/flash_gar_servo_pet_spinand.bin.padded
 pub/uuu-ram/Image.padded
-pub/uuu-ram/imx91-11x11-frdm-imx91s.dtb.padded
+pub/uuu-ram/imx91-11x11-frdm-imx91s-gar-servo-pet.dtb.padded
 pub/uuu-ram/fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.zst.padded
 pub/rootfs/rootfs.squashfs
 pub/rootfs/usr.local.tar.bz2
@@ -118,6 +118,37 @@ command before the first NAND write. Set
 The generic implementation, board bring-up record, and troubleshooting matrix
 are under `sources/gar-tools/targets/frdm-imx91s/`; Product-specific servo and
 application information remains outside the Target Pack.
+
+## PCA9685 expansion-header I2C
+
+The NXP base DTB leaves the 40-pin header's I2C4 function disabled.
+GarServoPet owns a small DT overlay that assigns pin 3 to LPI2C4 SDA and pin 5
+to LPI2C4 SCL at 100 kHz. Generate the Product DTB without replacing the NXP
+base file:
+
+```bash
+scripts/build-imx91s-dtb.sh
+```
+
+The output is
+`artifacts/from-codespace/pub/kernel/imx91-11x11-frdm-imx91s-gar-servo-pet.dtb`.
+The generator verifies the live node path, clock rate, and both pinmux tuples
+after applying the overlay. It uses local `dtc` tools when installed and an
+ephemeral Docker tool container otherwise.
+
+To update an already provisioned board without rewriting its bootloader,
+kernel, config, or rootfs, generate the guarded DTB-only UUU command list:
+
+```bash
+GAR_UUU_BIN=/home/user/.local/bin/uuu \
+  scripts/generate-imx91s-dtb-update.sh --validate
+```
+
+Put the board in Serial Downloader mode and run the generated
+`artifacts/from-codespace/Update-dtb-gar-servo-pet.lst`. Success ends with
+`GAR_IMX91S_DTB_UPDATE_COMPLETE`; then power-cycle in internal SPI-NAND boot
+mode. The Linux alias for LPI2C4 is `i2c3`, so the expected interface is
+`/dev/i2c-3`.
 
 The component build follows the NXP BSP values already checked into the local
 build notes: U-Boot `lf_v2024.04` with

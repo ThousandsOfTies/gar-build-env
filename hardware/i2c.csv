@@ -1,2 +1,2 @@
 name,bus,dev,address,driver,sim,description
-pca9685-1,1,/dev/i2c-1,0x40,pca9685,pca9685,PCA9685 controller used by the VM simulation
+pca9685-1,3,/dev/i2c-3,0x40,pca9685,pca9685,PCA9685 on FRDM-IMX91S LPI2C4 header pins 3 and 5
