@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "raspberry-pi-5",
+  "status": "planned",
+  "product": "gar-adhoc-app",
+  "application": "sources/gar-adhoc-app/app.json",
+  "target": "raspberry-pi-5",
+  "binding": null,
+  "artifact": {
+    "kind": "ssh-app",
+    "manifest": "config/deployments/raspberry-pi-5.artifact.json"
+  },
+  "packager": "scripts/targets/raspberry-pi-5/package.sh"
+}

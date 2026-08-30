@@ -139,3 +139,15 @@ build hookを追加してください。
 
 PlatformIO は Python 仮想環境 `~/.venvs/platformio` にインストールされ、
 `~/.bashrc` に PATH が追加されます。
+
+## Application / Deployment / Target Capsule
+
+アプリ契約は`sources/gar-adhoc-app/app.json`、Raspberry Pi 5への組み合わせは
+`config/deployments/raspberry-pi-5.json`、実装予定の物理ビルドは
+`scripts/targets/raspberry-pi-5/`が所有します。現在のprofileは`planned`であり、
+実装が追加されるまで実機packageは明示的に失敗します。
+
+```bash
+make check-deployment
+scripts/product-target-build.sh --describe
+```

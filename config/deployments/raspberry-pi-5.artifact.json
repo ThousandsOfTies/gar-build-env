@@ -1,0 +1,15 @@
+{
+  "name": "gar-adhoc-app-target",
+  "target": "raspberry-pi-5",
+  "deploy": {
+    "app": {
+      "files": [
+        {
+          "src": "files/gar-adhoc-app",
+          "dest": "/opt/gar/apps/gar-adhoc-app",
+          "mode": "0755"
+        }
+      ]
+    }
+  }
+}
