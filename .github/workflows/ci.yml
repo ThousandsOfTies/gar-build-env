@@ -2,7 +2,7 @@ name: GarServoPet parent CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, GarServoPet]
   pull_request:
 
 jobs:
@@ -16,12 +16,31 @@ jobs:
 
       - name: Validate repository contracts
         run: |
-          python3 -m json.tool config/artifact-manifest.example.json >/dev/null
-          bash -n scripts/*.sh
+          sudo apt-get update
+          sudo apt-get install --yes device-tree-compiler gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf
+          python3 -m json.tool config/deployments/frdm-imx91s.json >/dev/null
+          python3 -m json.tool config/deployments/frdm-imx91s.artifact.json >/dev/null
+          python3 -m json.tool config/deployments/luckfox-rk3506.json >/dev/null
+          python3 -m json.tool config/deployments/luckfox-rk3506.artifact.json >/dev/null
+          python3 -m json.tool sources/gar-servo-pet/app.json >/dev/null
+          make check
           node --check panel/components/servo-model.mjs
           node --check panel/components/pca9685.js
           node --check panel/components/sg90.js
-          node --test tests/servo-model.test.mjs
+          make -C sources/gar-servo-pet target-build
+          readelf -h sources/gar-servo-pet/build/target/gar-servoctl \
+            | grep -Eq 'Machine:[[:space:]]+AArch64'
+          make -B -C sources/gar-servo-pet target-build \
+            TARGET_CC=arm-linux-gnueabihf-gcc TARGET_LDFLAGS=-static
+          readelf -h sources/gar-servo-pet/build/target/gar-servoctl \
+            | grep -Eq 'Class:[[:space:]]+ELF32'
+          readelf -h sources/gar-servo-pet/build/target/gar-servoctl \
+            | grep -Eq 'Machine:[[:space:]]+ARM'
+          readelf -A sources/gar-servo-pet/build/target/gar-servoctl \
+            | grep -Eq 'Tag_ABI_VFP_args:[[:space:]]+VFP registers'
+          sources/gar-servo-pet/build/host/gar-servoctl \
+            --i2c-config hardware/profiles/frdm-imx91s/i2c.csv \
+            --servo-config hardware/servo-calibration.csv validate
           test -f sources/gar-servo-pet/README.md
           test -f sources/gar-tools/README.md
           git submodule status --recursive

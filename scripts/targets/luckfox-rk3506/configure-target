@@ -1,0 +1,157 @@
+#!/bin/sh
+# Enable the Product's I2C1 header binding in the installed Lyra Plus FIT DTB.
+set -eu
+
+fail() {
+    echo "gar-servo-pet Lyra target configuration: $*" >&2
+    exit 2
+}
+
+[ "$(id -u)" -eq 0 ] || fail "root is required"
+model=$(tr -d '\000' </proc/device-tree/model 2>/dev/null || true)
+[ "$model" = "Luckfox Lyra Plus" ] || fail "unsupported board: ${model:-unknown}"
+
+app_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+tools="$app_dir/tools"
+export LD_LIBRARY_PATH="$app_dir/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+for tool in dtc fdtget fdtoverlay fdtput; do
+    [ -x "$tools/$tool" ] || fail "bundled tool is missing: $tool"
+done
+
+overlay_source="$app_dir/rk3506-gar-servo-pet-i2c1-overlay.dts"
+[ -r "$overlay_source" ] || fail "I2C1 overlay is missing"
+
+live_configuration_ready() {
+    live_status=$(tr -d '\000' </proc/device-tree/i2c@ff050000/status 2>/dev/null || true)
+    [ "$live_status" = "okay" ] || return 1
+    [ -r /proc/device-tree/pinctrl/gar-servo-pet-i2c1-pins/scl/rockchip,pins ] || return 1
+    [ -r /proc/device-tree/pinctrl/gar-servo-pet-i2c1-pins/sda/rockchip,pins ] || return 1
+    if [ ! -c /dev/i2c-1 ] && command -v modprobe >/dev/null 2>&1; then
+        modprobe i2c-dev >/dev/null 2>&1 || true
+    fi
+    [ -c /dev/i2c-1 ]
+}
+
+if live_configuration_ready; then
+    exit 0
+fi
+
+boot_device=/dev/mtdblock1
+if [ ! -r "$boot_device" ] || [ ! -w "$boot_device" ]; then
+    fail "$boot_device is unavailable"
+fi
+
+work=$(mktemp -d /tmp/gar-servo-pet-dtb.XXXXXX)
+trap 'rm -rf -- "$work"' EXIT HUP INT TERM
+
+header="$work/header.dtb"
+patched_header="$work/header.patched.dtb"
+current_dtb="$work/current.dtb"
+overlay="$work/i2c1.dtbo"
+patched_dtb="$work/patched.dtb"
+
+dd if="$boot_device" of="$header" bs=2048 count=1 >/dev/null 2>&1
+fdt_position=$("$tools/fdtget" -ti "$header" /images/fdt data-position) || \
+    fail "FIT Device Tree position could not be read"
+current_size=$("$tools/fdtget" -ti "$header" /images/fdt data-size) || \
+    fail "FIT Device Tree size could not be read"
+kernel_position=$("$tools/fdtget" -ti "$header" /images/kernel data-position) || \
+    fail "FIT kernel position could not be read"
+hash_algorithm=$("$tools/fdtget" -ts "$header" /images/fdt/hash algo) || \
+    fail "FIT Device Tree hash algorithm could not be read"
+for value in "$fdt_position" "$current_size" "$kernel_position"; do
+    case "$value" in
+        ""|*[!0-9]*) fail "invalid FIT image metadata: $value" ;;
+    esac
+done
+[ "$hash_algorithm" = "sha256" ] || fail "unsupported FIT Device Tree hash: $hash_algorithm"
+
+dd if="$boot_device" of="$current_dtb" bs=1 \
+    skip="$fdt_position" count="$current_size" >/dev/null 2>&1
+
+dtb_configuration_ready() {
+    candidate_dtb=$1
+    [ "$("$tools/fdtget" -ts "$candidate_dtb" /i2c@ff050000 status 2>/dev/null || true)" = "okay" ] || return 1
+    [ "$("$tools/fdtget" -ti "$candidate_dtb" /i2c@ff050000 clock-frequency 2>/dev/null || true)" = "100000" ] || return 1
+    [ "$("$tools/fdtget" -ts "$candidate_dtb" /i2c@ff050000 pinctrl-names 2>/dev/null || true)" = "default" ] || return 1
+    # shellcheck disable=SC2046
+    set -- $("$tools/fdtget" -ti "$candidate_dtb" /pinctrl/gar-servo-pet-i2c1-pins/scl rockchip,pins 2>/dev/null || true)
+    [ "$#" -eq 4 ] && [ "$1" = 0 ] && [ "$2" = 10 ] && [ "$3" = 32 ] || return 1
+    # shellcheck disable=SC2046
+    set -- $("$tools/fdtget" -ti "$candidate_dtb" /pinctrl/gar-servo-pet-i2c1-pins/sda rockchip,pins 2>/dev/null || true)
+    [ "$#" -eq 4 ] && [ "$1" = 0 ] && [ "$2" = 11 ] && [ "$3" = 33 ] || return 1
+    # shellcheck disable=SC2046
+    set -- $("$tools/fdtget" -ti "$candidate_dtb" /i2c@ff050000 pinctrl-0 2>/dev/null || true)
+    [ "$#" -eq 2 ]
+}
+
+if dtb_configuration_ready "$current_dtb"; then
+    echo "GarServoPet I2C1 configuration is installed; target reboot is still required."
+    exit 10
+fi
+
+"$tools/dtc" -@ -I dts -O dtb -o "$overlay" "$overlay_source"
+"$tools/fdtoverlay" -i "$current_dtb" -o "$patched_dtb" "$overlay"
+dtb_configuration_ready "$patched_dtb" || fail "patched I2C1 verification failed"
+
+patched_size=$(wc -c <"$patched_dtb" | tr -d ' ')
+[ $((fdt_position + patched_size)) -le "$kernel_position" ] || \
+    fail "patched Device Tree overlaps the FIT kernel image"
+mtd_size=$(cat /sys/class/mtd/mtd1/size 2>/dev/null || echo 0)
+case "$mtd_size" in
+    ""|*[!0-9]*) fail "invalid boot partition size: $mtd_size" ;;
+esac
+[ $((fdt_position + patched_size)) -lt "$mtd_size" ] || \
+    fail "patched Device Tree exceeds the boot partition"
+
+backup_dir=/var/lib/gar/backups
+backup="$backup_dir/luckfox-lyra-plus-boot-original.img"
+mkdir -p "$backup_dir"
+if [ -e "$backup" ] || [ -L "$backup" ]; then
+    if [ ! -f "$backup" ] || [ -L "$backup" ]; then
+        fail "boot backup is not a regular file"
+    fi
+else
+    backup_temporary="$backup.gar-new.$$"
+    dd if="$boot_device" of="$backup_temporary" bs=4096 >/dev/null 2>&1
+    chmod 0600 "$backup_temporary"
+    sync
+    mv "$backup_temporary" "$backup"
+fi
+
+cp "$header" "$patched_header"
+"$tools/fdtput" -ti "$patched_header" /images/fdt data-size "$patched_size"
+sha256=$(sha256sum "$patched_dtb" | awk '{print $1}')
+hash_values=""
+remaining="$sha256"
+while [ -n "$remaining" ]; do
+    word=$(printf '%s' "$remaining" | cut -c 1-8)
+    hash_values="$hash_values 0x$word"
+    remaining=$(printf '%s' "$remaining" | cut -c 9-)
+done
+# hash_values contains eight validated hexadecimal words from sha256sum.
+# shellcheck disable=SC2086
+"$tools/fdtput" -tx "$patched_header" /images/fdt/hash value $hash_values
+[ "$(wc -c <"$patched_header" | tr -d ' ')" -le "$fdt_position" ] || \
+    fail "updated FIT header exceeds its reserved area"
+
+dd if="$patched_header" of="$boot_device" bs=1 seek=0 \
+    count="$(wc -c <"$patched_header" | tr -d ' ')" conv=notrunc >/dev/null 2>&1
+dd if="$patched_dtb" of="$boot_device" bs=1 \
+    seek="$fdt_position" count="$patched_size" conv=notrunc >/dev/null 2>&1
+sync
+
+written_header="$work/written-header.dtb"
+written_dtb="$work/written.dtb"
+dd if="$boot_device" of="$written_header" bs=2048 count=1 >/dev/null 2>&1
+dd if="$boot_device" of="$written_dtb" bs=1 \
+    skip="$fdt_position" count="$patched_size" >/dev/null 2>&1
+[ "$("$tools/fdtget" -ti "$written_header" /images/fdt data-size 2>/dev/null || true)" = "$patched_size" ] || \
+    fail "FIT Device Tree size write-back verification failed"
+written_hash=$("$tools/fdtget" -tx "$written_header" /images/fdt/hash value 2>/dev/null | tr -d ' \n' || true)
+[ "$written_hash" = "$sha256" ] || fail "FIT Device Tree hash write-back verification failed"
+[ "$(sha256sum "$written_dtb" | awk '{print $1}')" = "$sha256" ] || \
+    fail "Device Tree write-back verification failed"
+
+echo "GarServoPet I2C1 configuration installed; target reboot is required."
+exit 10

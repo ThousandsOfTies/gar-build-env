@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "frdm-imx91s",
+  "product": "gar-servo-pet",
+  "application": "sources/gar-servo-pet/app.json",
+  "target": "frdm-imx91s",
+  "binding": "hardware/bindings/frdm-imx91s.json",
+  "runtime": {
+    "i2c": "hardware/profiles/frdm-imx91s/i2c.csv",
+    "connections": "hardware/connections.csv",
+    "servo_calibration": "hardware/servo-calibration.csv"
+  },
+  "artifact": {
+    "kind": "uuu-image-and-app",
+    "manifest": "config/deployments/frdm-imx91s.artifact.json"
+  },
+  "target_config": {
+    "defaults": "config/frdm-imx91s.env.example",
+    "local": "config/frdm-imx91s.env"
+  },
+  "packager": "scripts/targets/frdm-imx91s/package.sh"
+}

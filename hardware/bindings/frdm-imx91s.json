@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "product": "gar-servo-pet",
+  "target": "frdm-imx91s",
+  "interfaces": [
+    {
+      "id": "servo-bus",
+      "kind": "i2c",
+      "controller": "LPI2C4",
+      "bus": 3,
+      "device": "/dev/i2c-3",
+      "address": "0x40",
+      "frequency_hz": 100000,
+      "logic_voltage_v": 3.3,
+      "pins": {
+        "SDA": "3",
+        "SCL": "5"
+      }
+    }
+  ]
+}

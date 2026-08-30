@@ -1,0 +1,66 @@
+/dts-v1/;
+/plugin/;
+
+/*
+ * GarServoPet expansion-header I2C bus and power rails.
+ *
+ * FRDM-IMX91S 40-pin header:
+ *   pin 3: GPIO_IO02 / LPI2C4_SDA
+ *   pin 5: GPIO_IO03 / LPI2C4_SCL
+ *   pin 1/17: switched 3.3 V expansion rail
+ *   pin 2/4: switched 5 V expansion rail
+ *
+ * The FRDM-IMX91S base DT describes both expansion rails as fixed regulators
+ * controlled by PCAL6524, but it does not keep them enabled. Linux therefore
+ * disables the unclaimed rails during boot. PCA9685 logic needs the 3.3 V
+ * rail; keep both documented header rails enabled for a predictable Product
+ * hardware contract. Servo power remains a separate external 5 V supply.
+ *
+ * The numeric pin tuples are the values of:
+ *   MX91_PAD_GPIO_IO02__LPI2C4_SDA
+ *   MX91_PAD_GPIO_IO03__LPI2C4_SCL
+ * from imx91-pinfunc.h. Numeric values keep this overlay compilable without
+ * requiring a complete Linux kernel source checkout.
+ */
+
+/ {
+	fragment@0 {
+		target-path = "/soc@0/bus@44000000/pinctrl@443c0000";
+
+		__overlay__ {
+			gar_servo_pet_lpi2c4_pins: lpi2c4-gar-servo-pet-grp {
+				fsl,pins = <
+					0x0018 0x01c8 0x03fc 0x01 0x00 0x40000b9e
+					0x001c 0x01cc 0x03f8 0x01 0x00 0x40000b9e
+				>;
+			};
+		};
+	};
+
+	fragment@1 {
+		target-path = "/soc@0/bus@42000000/i2c@42540000";
+
+		__overlay__ {
+			clock-frequency = <100000>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&gar_servo_pet_lpi2c4_pins>;
+			status = "okay";
+		};
+	};
+
+	fragment@2 {
+		target-path = "/regulator-exp-3v3";
+
+		__overlay__ {
+			regulator-always-on;
+		};
+	};
+
+	fragment@3 {
+		target-path = "/regulator-exp-5v";
+
+		__overlay__ {
+			regulator-always-on;
+		};
+	};
+};

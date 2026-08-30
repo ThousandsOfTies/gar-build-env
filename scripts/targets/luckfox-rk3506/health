@@ -1,0 +1,16 @@
+#!/bin/sh
+# Lifecycle health is deliberately non-actuating: validate configuration and
+# require the I2C character device, but do not probe or write the PCA9685.
+set -eu
+
+app_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+model=$(tr -d '\000' </proc/device-tree/model 2>/dev/null || true)
+[ "$model" = "Luckfox Lyra Plus" ] || {
+    echo "gar-servo-pet health: unsupported board: ${model:-unknown}" >&2
+    exit 1
+}
+[ -c /dev/i2c-1 ] || {
+    echo "gar-servo-pet health: /dev/i2c-1 is unavailable" >&2
+    exit 1
+}
+exec "$app_dir/run" validate

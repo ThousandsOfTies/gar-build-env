@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "luckfox-rk3506",
+  "product": "gar-servo-pet",
+  "application": "sources/gar-servo-pet/app.json",
+  "target": "luckfox-rk3506",
+  "binding": "hardware/bindings/luckfox-rk3506.json",
+  "runtime": {
+    "i2c": "hardware/profiles/luckfox-rk3506/i2c.csv",
+    "connections": "hardware/connections.csv",
+    "servo_calibration": "hardware/servo-calibration.csv"
+  },
+  "artifact": {
+    "kind": "ssh-app",
+    "manifest": "config/deployments/luckfox-rk3506.artifact.json"
+  },
+  "target_config": {
+    "defaults": "config/luckfox-rk3506.env.example",
+    "local": "config/luckfox-rk3506.env"
+  },
+  "packager": "scripts/targets/luckfox-rk3506/package.sh"
+}

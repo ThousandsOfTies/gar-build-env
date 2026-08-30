@@ -1,0 +1,2 @@
+name,bus,dev,address,driver,sim,description
+pca9685-1,1,/dev/i2c-1,0x40,pca9685,pca9685,PCA9685 on Luckfox Lyra Plus I2C1 pins 17 SDA and 19 SCL

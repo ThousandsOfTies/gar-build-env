@@ -1,0 +1,16 @@
+{
+  "name": "gar-servo-pet-luckfox-rk3506",
+  "target": "luckfox-rk3506",
+  "entrypoint": "/opt/gar/apps/gar-servo-pet/run",
+  "deploy": {
+    "app": {
+      "files": [
+        {
+          "src": "files/gar-servo-pet",
+          "dest": "/opt/gar/apps/gar-servo-pet",
+          "mode": "0755"
+        }
+      ]
+    }
+  }
+}

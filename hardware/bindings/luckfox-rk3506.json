@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "product": "gar-servo-pet",
+  "target": "luckfox-rk3506",
+  "interfaces": [
+    {
+      "id": "servo-bus",
+      "kind": "i2c",
+      "controller": "I2C1",
+      "bus": 1,
+      "device": "/dev/i2c-1",
+      "address": "0x40",
+      "frequency_hz": 100000,
+      "logic_voltage_v": 3.3,
+      "pins": {
+        "SDA": "17:RM_IO11",
+        "SCL": "19:RM_IO10"
+      }
+    }
+  ]
+}
