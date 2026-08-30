@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "esp32",
+  "status": "active",
+  "product": "gar-vibe-remote",
+  "application": "sources/gar-vibe-ui/app.json",
+  "target": "esp32",
+  "binding": "hardware/bindings/esp32.json",
+  "artifact": {
+    "kind": "firmware",
+    "manifest": "config/deployments/esp32.artifact.json"
+  },
+  "packager": "scripts/targets/esp32/package.sh"
+}

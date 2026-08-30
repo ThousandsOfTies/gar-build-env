@@ -164,3 +164,15 @@ scripts/product-clean.sh
 
 PlatformIO は Python 仮想環境 `~/.venvs/platformio` にインストールされ、
 `~/.bashrc` に PATH が追加されます。
+
+## Application / Deployment / Target Capsule
+
+Application契約は`sources/gar-vibe-ui/app.json`、ESP32 firmwareとの組み合わせは
+`config/deployments/esp32.json`、M5StickC firmware package実装は
+`scripts/targets/esp32/package.sh`が所有します。
+`scripts/product-target-build.sh`はGAR向けの互換入口です。
+
+```bash
+make check-deployment
+scripts/product-target-build.sh --describe
+```

@@ -1,0 +1,14 @@
+{
+  "name": "gar-vibe-remote-firmware",
+  "target": "esp32",
+  "deploy": {
+    "app": {
+      "files": [
+        {
+          "src": "files/m5stickc-firmware",
+          "dest": "firmware"
+        }
+      ]
+    }
+  }
+}

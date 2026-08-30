@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "product": "gar-vibe-remote",
+  "target_id": "esp32",
+  "mappings": [
+    {
+      "requirement": "vibe-remote-firmware",
+      "resource": "m5stickc-plus2",
+      "pinmux": "board-default"
+    }
+  ]
+}
