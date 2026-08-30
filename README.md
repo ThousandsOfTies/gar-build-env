@@ -242,3 +242,15 @@ directory直下、旧RV1106 profileは`hardware/targets/luckfox-rv1106/`です�
 RV1106向けの旧Product制御ロジックと設計メモは`tools/rv1106/`と`docs/rv1106/`へ
 分離しています。toolchain、USB/SSH bring-up、device providerなど再利用可能な
 Target Pack資産だけを`gar-tools`に残します。
+
+## Application / Deployment / Target Capsule
+
+Application契約は`sources/gar-stream-tx/app.json`、Raspberry Pi 5との組み合わせは
+`config/deployments/raspberry-pi-5.json`、実機package実装は
+`scripts/targets/raspberry-pi-5/package.sh`が所有します。
+`scripts/product-target-build.sh`はGAR向けの互換入口です。
+
+```bash
+make check-deployment
+scripts/product-target-build.sh --describe
+```

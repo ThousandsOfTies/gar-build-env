@@ -38,7 +38,13 @@ jobs:
       - name: Run parent tests and shell syntax checks
         run: |
           python -m unittest discover -s tests -v
-          bash -n scripts/product-sim-build.sh scripts/product-sim-env-build.sh scripts/product-target-build.sh
+          bash -n \
+            scripts/product-sim-build.sh \
+            scripts/product-sim-env-build.sh \
+            scripts/package-target.sh \
+            scripts/product-target-build.sh \
+            scripts/targets/raspberry-pi-5/package.sh
+          scripts/product-target-build.sh --describe >/dev/null
       - name: Build actual simulation and Target hook bundles
         run: |
           rm -rf artifacts/ci artifacts/from-codespace

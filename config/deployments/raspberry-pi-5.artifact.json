@@ -1,0 +1,14 @@
+{
+  "name": "gar-stream-tx-target",
+  "target": "raspberry-pi-5",
+  "deploy": {
+    "app": {
+      "files": [
+        {
+          "src": "files/gar-stream-tx",
+          "dest": "/opt/gar/apps/gar-stream-tx"
+        }
+      ]
+    }
+  }
+}
