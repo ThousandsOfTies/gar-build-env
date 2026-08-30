@@ -1,0 +1,8 @@
+[submodule "sources/gar-talkable-duck"]
+	path = sources/gar-talkable-duck
+	url = https://github.com/ThousandsOfTies/gar-talkable-duck.git
+	branch = main
+[submodule "sources/gar-tools"]
+	path = sources/gar-tools
+	url = https://github.com/ThousandsOfTies/gar-tools.git
+	branch = main
