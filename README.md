@@ -131,3 +131,15 @@ Artifact manifest は製品固有の定義です。必要な製品ブランチ�
 
 PlatformIO は Python 仮想環境 `~/.venvs/platformio` にインストールされ、
 `~/.bashrc` に PATH が追加されます。
+
+## Application / Deployment / Target Capsule
+
+Application契約は`sources/gar-talkable-duck/app.json`、MicroDuckとの組み合わせは
+`config/deployments/microduck.json`、将来の実機package実装は
+`scripts/targets/microduck/`が所有します。現在のprofileは`planned`であり、
+実装が追加されるまで実機packageは明示的に失敗します。
+
+```bash
+make check-deployment
+scripts/product-target-build.sh --describe
+```

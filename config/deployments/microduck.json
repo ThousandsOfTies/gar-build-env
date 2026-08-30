@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "microduck",
+  "status": "planned",
+  "product": "gar-talkable-duck",
+  "application": "sources/gar-talkable-duck/app.json",
+  "target": "microduck",
+  "binding": null,
+  "artifact": {
+    "kind": "planned-app",
+    "manifest": "config/deployments/microduck.artifact.json"
+  },
+  "packager": "scripts/targets/microduck/package.sh"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "gar-talkable-duck-target",
+  "target": "microduck",
+  "deploy": {
+    "app": {
+      "files": [
+        {
+          "src": "files/gar-talkable-duck",
+          "dest": "/opt/gar/apps/gar-talkable-duck"
+        }
+      ]
+    }
+  }
+}
