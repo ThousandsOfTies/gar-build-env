@@ -39,6 +39,13 @@ Artifact manifests are product-specific config, not shared runtime code. Use
 product branch needs a deploy manifest. Product hooks write `artifact.json`;
 GAR alone adds schema-v2 `artifact-info.json` snapshot metadata.
 
+For Web simulator panels in any Product branch, follow the shared component
+contract in `sources/gar-tools/AGENTS.md` before implementation.
+Keep reusable device UI and interaction in gar-tools Web Components, and keep
+Product messages, wiring, scenarios, and commands in the Product adapter. If
+the pinned gar-tools copy predates this guide, consult the latest gar-tools
+guide and update the pin when using newer shared components.
+
 ## Submodule Edits
 
 On product branches that use submodules, commit and push the child repository
